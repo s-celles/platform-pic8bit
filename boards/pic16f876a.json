@@ -1,0 +1,44 @@
+{
+  "build": {
+    "core": "pic16f876a",
+    "extra_flags": "-DPIC16F876A",
+    "f_cpu": "4000000",
+    "mcu": "pic16f876a",
+    "variant": "pic16f876a"
+  },
+  "debug": {
+    "tools": {
+      "mplab-ice": {
+        "server": {
+          "executable": "bin/mplabx-ice",
+          "arguments": [
+            "--chip", "PIC16F876A"
+          ]
+        }
+      }
+    }
+  },
+  "frameworks": [
+    "pic-xc8"
+  ],
+  "name": "⚠️ UNOFFICIAL PIC16F876A",
+  "upload": {
+    "maximum_ram_size": 368,
+    "maximum_size": 8192,
+    "protocol": "pickit3",
+    "protocols": [
+      "pickit2",
+      "pickit3",
+      "pickit4",
+      "mplab-ice",
+      "custom"
+    ]
+  },
+  "url": "https://www.microchip.com/en-us/product/PIC16F876A",
+  "vendor": "Microchip",
+  "disclaimers": {
+    "unofficial": "⚠️ UNOFFICIAL board support - NOT officially supported by Microchip",
+    "experimental": "Experimental community project - use at your own risk",
+    "official_tools": "For official support, use MPLAB X IDE from Microchip"
+  }
+}

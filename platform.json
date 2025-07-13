@@ -1,0 +1,50 @@
+{
+  "name": "pic8bit",
+  "title": "⚠️ UNOFFICIAL Microchip PIC 8-bit",
+  "description": "⚠️ UNOFFICIAL support for Microchip PIC 8-bit microcontrollers using XC8 compiler via xc8-wrapper. NOT officially supported by Microchip or PlatformIO. Experimental community project - use at your own risk.",
+  "homepage": "https://github.com/s-celles/platform-pic8bit",
+  "license": "Apache-2.0",
+  "keywords": [
+    "dev-platform",
+    "microchip",
+    "pic",
+    "8-bit",
+    "xc8",
+    "unofficial",
+    "experimental",
+    "community"
+  ],
+  "engines": {
+    "platformio": "^6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s-celles/platform-pic8bit.git"
+  },
+  "version": "0.1.0",
+  "frameworks": {
+    "pic-xc8": {
+      "script": "builder/frameworks/xc8.py",
+      "title": "XC8 Framework (via xc8-wrapper)",
+      "description": "XC8 compiler framework using xc8-wrapper for separate compilation support"
+    }
+  },
+  "packages": {
+    "toolchain-xc8": {
+      "type": "toolchain",
+      "optional": true,
+      "version": "*",
+      "description": "XC8 toolchain (must be installed separately from Microchip)"
+    }
+  },
+  "boards": {
+    "pic16f876a": "boards/pic16f876a.json"
+  },
+  "disclaimers": {
+    "unofficial_support": "⚠️ This is UNOFFICIAL support for Microchip PIC microcontrollers",
+    "not_supported": "NOT officially supported by Microchip or PlatformIO",
+    "experimental": "Experimental community project - use at your own risk",
+    "official_alternative": "For official support, use MPLAB X IDE from Microchip",
+    "requirements": "Requires XC8 compiler and xc8-wrapper to be installed separately"
+  }
+}
