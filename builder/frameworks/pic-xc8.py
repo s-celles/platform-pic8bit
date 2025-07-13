@@ -44,14 +44,6 @@ print(f"📁 Build directory: {BUILD_DIR}")
 print(f"📁 Source directory: {PROJECT_SRC_DIR}")
 print("")
 
-# Add xc8-wrapper to Python path if available
-XC8_WRAPPER_DIR = Path(PROJECT_DIR) / "xc8-wrapper"
-if XC8_WRAPPER_DIR.exists():
-    sys.path.insert(0, str(XC8_WRAPPER_DIR))
-    print(f"📋 Added xc8-wrapper to Python path: {XC8_WRAPPER_DIR}")
-else:
-    print("⚠️  xc8-wrapper not found in project directory")
-
 try:
     from xc8_wrapper import run_command, get_xc8_tool_path, log
 
