@@ -65,45 +65,29 @@ print(f"🔧 Optimization level: {OPTIMIZATION}")
 print("")
 
 
-# Get source files from PlatformIO
 def get_project_sources():
-    """Get source files from the project"""
-    sources = []
-
-    # Check if a specific source directory is configured
-    custom_src_dir = env.GetProjectOption("src_dir", None)
-    print(f"📋 Checking custom src_dir: '{custom_src_dir}'")
-
-    if custom_src_dir and custom_src_dir != "src":
-        # Use the custom source directory relative to project
-        src_dir = Path(PROJECT_DIR) / custom_src_dir
-        print(f"📁 Using custom source directory: {custom_src_dir}")
-    else:
-        # Fall back to default PlatformIO source directory
-        src_dir = Path(PROJECT_SRC_DIR)
-        print(f"📁 Using default source directory: {PROJECT_SRC_DIR}")
-
-    print(f"📁 Resolved source directory: {src_dir}")
-
-    if src_dir.exists():
-        # Get all C files recursively
-        for c_file in src_dir.rglob("*.c"):
-            sources.append(str(c_file))
-    else:
-        print(f"⚠️  Source directory does not exist: {src_dir}")
-
-    print(f"📁 Found {len(sources)} C source files:")
-    for src in sources:
+    """Get source files from PROJECT_SRC_DIR, respecting build_src_filter and excluding headers"""
+    print("Collecting source files with build_src_filter support")
+    
+    # Use PlatformIO's standard source collection mechanism
+    # This automatically respects build_src_filter configuration
+    source_files = [
+        str(Path(PROJECT_SRC_DIR) / str(f))  # Make absolute paths using pathlib
+        for f in env.MatchSourceFiles(PROJECT_SRC_DIR, env.get("SRC_FILTER"))
+        if not str(f).endswith(('.h', '.hpp'))  # Exclude header files
+    ]
+    
+    print(f"📁 Found {len(source_files)} source files:")
+    for src in source_files:
         print(f"  - {src}")
-
-    return sources
+        
+    return source_files
 
 
 # Build function using xc8-wrapper
 def build_with_xc8_wrapper(target, source, env):
     """Build using xc8-wrapper integrated with PlatformIO"""
-
-    print("🔄 Starting XC8 build with xc8-wrapper...")
+    print("🔄 *** PLATFORM FUNCTION *** Starting XC8 build with xc8-wrapper...")
 
     if not xc8_available:
         print("❌ xc8-wrapper not available!")
