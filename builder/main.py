@@ -13,6 +13,8 @@ from os.path import join
 from pathlib import Path
 from SCons.Script import ARGUMENTS, COMMAND_LINE_TARGETS, Default, DefaultEnvironment
 
+ALLOWED_UPLOAD_PROTOCOLS = ["ipecmd-wrapper"]
+
 # Initialize environment
 env = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -48,7 +50,9 @@ def upload_via_ipecmd(target, source, env):
         class Args:
             def __init__(self):
                 self.part = board.get("build.mcu", "pic16f876a").upper()
-                self.tool = env.GetProjectOption("upload_tool", "PK4")
+                upload_protocol = env.GetProjectOption("upload_protocol")
+                assert upload_protocol in ALLOWED_UPLOAD_PROTOCOLS, f"Unknown upload protocol '{upload_protocol}' - must be in {ALLOWED_UPLOAD_PROTOCOLS}"
+                self.tool = self._get_upload_option("tool", None)
                 self.file = str(source[0]) if source else None
                 self.power = self._get_upload_option("power", None)
                 self.memory = ""
@@ -76,7 +80,6 @@ def upload_via_ipecmd(target, source, env):
                         resolved_flags = env.subst("$UPLOAD_FLAGS")
                         if resolved_flags and resolved_flags != "$UPLOAD_FLAGS":
                             upload_flags = resolved_flags.split()
-                            print(f"🐛 DEBUG: upload_flags (subst) = {upload_flags}")
                     except:
                         pass
                 
