@@ -41,7 +41,7 @@ env.Append(CPPDEFINES=["$BOARD_MCU"])
 def upload_via_ipecmd(target, source, env):
     """Upload firmware via IPECMD wrapper"""
     print("📦 Starting upload via IPECMD...")
-    
+
     try:
         # Import ipecmd-wrapper (now it should be installed)
         from ipecmd_wrapper.core import program_pic
@@ -51,7 +51,9 @@ def upload_via_ipecmd(target, source, env):
             def __init__(self):
                 self.part = board.get("build.mcu", "pic16f876a").upper()
                 upload_protocol = env.GetProjectOption("upload_protocol")
-                assert upload_protocol in ALLOWED_UPLOAD_PROTOCOLS, f"Unknown upload protocol '{upload_protocol}' - must be in {ALLOWED_UPLOAD_PROTOCOLS}"
+                assert upload_protocol in ALLOWED_UPLOAD_PROTOCOLS, (
+                    f"Unknown upload protocol '{upload_protocol}' - must be in {ALLOWED_UPLOAD_PROTOCOLS}"
+                )
                 self.tool = self._get_upload_option("tool", None)
                 self.file = str(source[0]) if source else None
                 self.power = self._get_upload_option("power", None)
@@ -61,48 +63,50 @@ def upload_via_ipecmd(target, source, env):
                 self.logout = True
                 self.vdd_first = False
                 self.test_programmer = False
-                
+
                 # Get ipecmd configuration from upload_flags
                 self.ipecmd_version = self._get_upload_option("ipecmd-version", None)
                 self.ipecmd_path = self._get_upload_option("ipecmd-path", None)
-            
-            def _get_upload_option(self, option_name: str, default=None, is_boolean=False):
+
+            def _get_upload_option(
+                self, option_name: str, default=None, is_boolean=False
+            ):
                 """Extract options from upload_flags with proper parsing"""
                 # Method 1: Use PlatformIO's built-in method
                 upload_flags = env.GetProjectOption("upload_flags", [])
-                
+
                 if isinstance(upload_flags, str):
                     upload_flags = upload_flags.split()
-                
+
                 # Method 2: Alternative - use env.subst to resolve variables
-                if not upload_flags or upload_flags == ['']:
+                if not upload_flags or upload_flags == [""]:
                     try:
                         resolved_flags = env.subst("$UPLOAD_FLAGS")
                         if resolved_flags and resolved_flags != "$UPLOAD_FLAGS":
                             upload_flags = resolved_flags.split()
                     except:
                         pass
-                
+
                 # Look for --option=value format
                 for flag in upload_flags:
                     if flag.startswith(f"--{option_name}="):
                         value = flag.split("=", 1)[1]
                         if is_boolean:
-                            return value.lower() in ('true', '1', 'yes', 'on')
+                            return value.lower() in ("true", "1", "yes", "on")
                         return value
-                
+
                 # Look for --option value format (separate arguments)
                 for i, flag in enumerate(upload_flags):
                     if flag == f"--{option_name}" and i + 1 < len(upload_flags):
                         value = upload_flags[i + 1]
                         if is_boolean:
-                            return value.lower() in ('true', '1', 'yes', 'on')
+                            return value.lower() in ("true", "1", "yes", "on")
                         return value
-                
+
                 # Look for boolean flags (just --option without value)
                 if is_boolean and f"--{option_name}" in upload_flags:
                     return True
-                    
+
                 return default
 
         args = Args()
@@ -130,6 +134,7 @@ def upload_via_ipecmd(target, source, env):
     except Exception as e:
         print(f"❌ Upload failed: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

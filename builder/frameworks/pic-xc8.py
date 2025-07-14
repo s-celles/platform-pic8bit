@@ -68,19 +68,19 @@ print("")
 def get_project_sources():
     """Get source files from PROJECT_SRC_DIR, respecting build_src_filter and excluding headers"""
     print("Collecting source files with build_src_filter support")
-    
+
     # Use PlatformIO's standard source collection mechanism
     # This automatically respects build_src_filter configuration
     source_files = [
         str(Path(PROJECT_SRC_DIR) / str(f))  # Make absolute paths using pathlib
         for f in env.MatchSourceFiles(PROJECT_SRC_DIR, env.get("SRC_FILTER"))
-        if not str(f).endswith(('.h', '.hpp'))  # Exclude header files
+        if not str(f).endswith((".h", ".hpp"))  # Exclude header files
     ]
-    
+
     print(f"📁 Found {len(source_files)} source files:")
     for src in source_files:
         print(f"  - {src}")
-        
+
     return source_files
 
 
@@ -121,23 +121,31 @@ def build_with_xc8_wrapper(target, source, env):
         # Initialize variables
         has_assembly = False
         has_c_files = False
-        
+
         try:
             # Detect if we have assembly files
-            assembly_extensions = {'.s', '.asm', '.S', '.inc', '.as'}
+            assembly_extensions = {".s", ".asm", ".S", ".inc", ".as"}
             print(f"🔧 DEBUG: source_files={source_files}")
             print(f"🔧 DEBUG: assembly_extensions={assembly_extensions}")
-            
-            has_assembly = any(Path(src).suffix.lower() in assembly_extensions for src in source_files)
-            has_c_files = any(Path(src).suffix.lower() in {'.c'} for src in source_files)
-            
+
+            has_assembly = any(
+                Path(src).suffix.lower() in assembly_extensions for src in source_files
+            )
+            has_c_files = any(
+                Path(src).suffix.lower() in {".c"} for src in source_files
+            )
+
             print(f"🔧 DEBUG: has_assembly={has_assembly}, has_c_files={has_c_files}")
-            
+
             # Check each file individually
             for src in source_files:
                 src_path = Path(src)
-                print(f"🔧 DEBUG: File: {src} -> suffix: '{src_path.suffix}' -> suffix.lower(): '{src_path.suffix.lower()}'")
-                print(f"🔧 DEBUG: Is assembly? {src_path.suffix.lower() in assembly_extensions}")
+                print(
+                    f"🔧 DEBUG: File: {src} -> suffix: '{src_path.suffix}' -> suffix.lower(): '{src_path.suffix.lower()}'"
+                )
+                print(
+                    f"🔧 DEBUG: Is assembly? {src_path.suffix.lower() in assembly_extensions}"
+                )
                 print(f"🔧 DEBUG: Is C? {src_path.suffix.lower() in {'.c'}}")
 
             # Base arguments for all file types
@@ -164,18 +172,21 @@ def build_with_xc8_wrapper(target, source, env):
             elif has_c_files:
                 # C project (with or without assembly)
                 print("🔧 Building C project")
-                xc8_args.extend([
-                    "-std=c99",
-                ])
+                xc8_args.extend(
+                    [
+                        "-std=c99",
+                    ]
+                )
                 print(f"🔧 DEBUG: C flags added: {xc8_args}")
                 if has_assembly:
                     print("🔧 Mixed C/assembly project detected")
             else:
                 print("⚠️ No recognized source files found")
-                
+
         except Exception as e:
             print(f"❌ ERROR in file detection: {e}")
             import traceback
+
             traceback.print_exc()
             # Default to basic args
             xc8_args = [
@@ -207,7 +218,7 @@ def build_with_xc8_wrapper(target, source, env):
                 print("🔧 Using XC8 compiler for C project")
                 tool_path, version_info = get_xc8_tool_path("cc")
                 print(f"📋 Using XC8 compiler: {tool_path}")
-            
+
             print(f"📋 Version: {version_info}")
         except Exception as e:
             print(f"❌ Failed to find XC8 tool: {e}")
