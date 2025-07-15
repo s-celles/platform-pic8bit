@@ -13,6 +13,14 @@ from os.path import join
 from pathlib import Path
 from SCons.Script import ARGUMENTS, COMMAND_LINE_TARGETS, Default, DefaultEnvironment
 
+try:
+    import xc8_wrapper
+    import ipecmd_wrapper
+except ImportError:
+    print("❌ Required Python packages 'xc8_wrapper' and/or 'ipecmd_wrapper' are missing.")
+    print("💡 Please run: pip install -r requirements.txt in the platform directory.")
+    env.Exit(1)
+
 ALLOWED_UPLOAD_PROTOCOLS = ["ipecmd-wrapper"]
 
 # Initialize environment
