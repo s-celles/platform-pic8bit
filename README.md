@@ -49,3 +49,15 @@ The XC8 compiler & MPLAB IPE tools are **proprietary software owned exclusively 
 - Make sure XC8 compiler is installed for compiling. 
 - Make sure MPLAB X and IPECMD are installed for uploading.
 - See `requirements.txt` for Python dependencies.
+
+## 🤝 Contributing
+
+Contributions welcome! See the [Contributing Guide](https://s-celles.github.io/xc8-wrapper/contributing/) for setup instructions and contribution guidelines.
+
+---
+
+<div align="center">
+
+Made with ❤️ by [Sébastien Celles](https://github.com/s-celles) for PIC developers community.
+
+</div>
