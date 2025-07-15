@@ -52,7 +52,7 @@ The XC8 compiler & MPLAB IPE tools are **proprietary software owned exclusively 
 
 ## 🤝 Contributing
 
-Contributions welcome! See the [Contributing Guide](https://s-celles.github.io/xc8-wrapper/contributing/) for setup instructions and contribution guidelines.
+Contributions welcome! See the [Contributing Guide](https://s-celles.github.io/platform-pic8bit/contributing/) for setup instructions and contribution guidelines.
 
 ---
 
