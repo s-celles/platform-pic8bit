@@ -10,8 +10,8 @@ Features may change and stability is not guaranteed.
 
 ## Features
 - Build and upload firmware for PIC 8-bit MCUs using PlatformIO
-- Supports (at least partially) [XC8 toolchain](https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers/xc8) via `xc8-wrapper`
-- Uploads HEX files using `ipecmd-wrapper` and [MPLAB IPECMD](https://microchip.my.site.com/s/article/Automate-MPLAB-programming-process-using-command-lineIPECMD)
+- Supports (at least partially) [XC8 toolchain](https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers/xc8) via [`xc8-wrapper`](https://s-celles.github.io/xc8-wrapper/)
+- Uploads HEX files using [`ipecmd-wrapper`](https://s-celles.github.io/ipecmd-wrapper/) and [MPLAB IPECMD](https://microchip.my.site.com/s/article/Automate-MPLAB-programming-process-using-command-lineIPECMD)
 
 ## Requirements
 - Python 3.9+
