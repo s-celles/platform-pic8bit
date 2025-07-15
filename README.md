@@ -1,6 +1,6 @@
 # 🏗️ PIC 8-bit platform for PlatformIO
 
-A Python wrapper for Microchip's IPECMD tool for PIC microcontroller programming.
+A PlatformIO platform for Microchip PIC microcontroller programming (8bit).
 
 ## 📚 Documentation
 
