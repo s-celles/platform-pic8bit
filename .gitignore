@@ -208,3 +208,6 @@ __marimo__/
 
 # Documentation build artifacts
 docs/build/
+
+# Visual Studio Code
+.vscode/
