@@ -14,7 +14,7 @@ Features may change and stability is not guaranteed.
 - Uploads HEX files using `ipecmd-wrapper` and [MPLAB IPECMD](https://microchip.my.site.com/s/article/Automate-MPLAB-programming-process-using-command-lineIPECMD)
 
 ## Requirements
-- Python 3.8+
+- Python 3.9+
 - PlatformIO
 - Required Python packages:
   - `xc8_wrapper`
