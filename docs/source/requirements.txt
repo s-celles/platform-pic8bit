@@ -3,4 +3,3 @@ sphinx-rtd-theme>=1.0.0
 sphinxcontrib-mermaid
 sphinx-copybutton
 sphinx-tabs
-sphinx_rtd_theme
