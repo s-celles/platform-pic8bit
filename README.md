@@ -1,4 +1,4 @@
-# PIC 8-bit Platform for PlatformIO
+# PIC 8-bit platform for PlatformIO
 
 ⚠️  UNOFFICIAL PLATFORM - NOT SUPPORTED BY MICROCHIP ⚠️
 
