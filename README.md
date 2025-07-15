@@ -41,7 +41,7 @@ The XC8 compiler & MPLAB IPE tools are **proprietary software owned exclusively 
 - **[📝 Changelog](https://s-celles.github.io/platform-pic8bit/changelog/)** - Release history
 
 ## 📄 License
-**platform-pic8bit** is released under the **Apache Licence version 2.0** (see [LICENSE](LICENSE) file).
+**platform-pic8bit** is released under the **Apache Licence 2.0** (see [LICENSE](LICENSE) file).
 **Microchip XC8 compiler & MPLAB IPE Tools**: Proprietary Microchip licenses (separate licensing required)
 
 ## Notes
