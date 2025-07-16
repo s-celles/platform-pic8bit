@@ -45,10 +45,6 @@ For more detailed information please visit `vendor site <https://www.microchip.c
     - Make sure MPLAB X and IPECMD are installed for uploading.
     - See requirements.txt for Python dependencies.
 
-.. contents:: Contents
-    :local:
-    :depth: 1
-
 Examples
 --------
 
