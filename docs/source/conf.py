@@ -45,7 +45,7 @@ html_theme_options = {
     # Links to source code
     "source_repository": "https://github.com/s-celles/platform-pic8bit",
     "source_branch": "main",
-    "source_directory": "docs/",
+    "source_directory": "",  # Changed from "docs/" to "" for correct edit link
     
     # Custom colors
     "light_css_variables": {
