@@ -129,12 +129,10 @@ Packages
 
     * - Name
       - Description
-    * - `toolchain-xc8 <https://registry.platformio.org/tools/microchip/toolchain-xc8>`__
-      - Microchip XC8 Compiler for 8-bit PIC microcontrollers
-    * - `tool-pickit3 <https://registry.platformio.org/tools/microchip/tool-pickit3>`__
-      - PICkit™ 3 In-Circuit Debugger/Programmer for PIC microcontrollers
-    * - `tool-mplab-ipe <https://registry.platformio.org/tools/microchip/tool-mplab-ipe>`__
-      - MPLAB IPE (Integrated Programming Environment) for Microchip devices
+    * - `xc8-wrapper <https://s-celles.github.io/xc8-wrapper/>`__
+      - Python wrapper for Microchip XC8 Compiler for 8-bit PIC microcontrollers
+    * - `ipecmd-wrapper <https://s-celles.github.io/ipecmd-wrapper/>`__
+      - Python wrapper for Microchip IPECMD command to program PIC microcontrollers
 
 .. warning::
     **Linux Users**:
