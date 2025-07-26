@@ -216,36 +216,41 @@ def build_with_xc8_wrapper(target, source, env):
             # Pure assembly project - use xc8-wrapper as with passthrough
             print("🔧 Using xc8-wrapper as with passthrough for pure assembly project")
 
-            # Prepare passthrough arguments for pic-as
+            # Prepare passthrough arguments for pic-as - include ALL arguments
             passthrough_args = []
             for arg in xc8_args:
-                if arg not in source_files and not arg.startswith("-o"):
+                if arg not in source_files:
                     passthrough_args.append(arg)
 
-            # Add source files to the main command
-            passthrough_str = " ".join(passthrough_args)
-            xc8_cmd = (
-                ["xc8-wrapper", "as", "--passthrough", passthrough_str]
-                + source_files
-                + ["-o", str(output_hex)]
-            )
+            # Add output file to passthrough
+            passthrough_args.extend(["-o", str(output_hex)])
+            
+            # Add source files to passthrough as well
+            passthrough_args.extend(source_files)
+
+            # Build command with everything in passthrough - properly quote all arguments
+            passthrough_str = " ".join(f'"{arg}"' for arg in passthrough_args)
+            xc8_cmd = ["xc8-wrapper", "as", "--passthrough", passthrough_str]
 
         else:
             # C project - use xc8-wrapper cc with passthrough
-            print("� Using xc8-wrapper cc with passthrough for C project")
+            print("🔧 Using xc8-wrapper cc with passthrough for C project")
 
-            # Prepare passthrough arguments for xc8-cc
+            # Prepare passthrough arguments for xc8-cc - include ALL arguments
             passthrough_args = []
             for arg in xc8_args:
-                if arg not in source_files and not arg.startswith("-o"):
+                if arg not in source_files:
                     passthrough_args.append(arg)
 
-            passthrough_str = " ".join(passthrough_args)
-            xc8_cmd = (
-                ["xc8-wrapper", "cc", "--passthrough", passthrough_str]
-                + source_files
-                + ["-o", str(output_hex)]
-            )
+            # Add output file to passthrough
+            passthrough_args.extend(["-o", str(output_hex)])
+            
+            # Add source files to passthrough as well
+            passthrough_args.extend(source_files)
+
+            # Build command with everything in passthrough - properly quote all arguments
+            passthrough_str = " ".join(f'"{arg}"' for arg in passthrough_args)
+            xc8_cmd = ["xc8-wrapper", "cc", "--passthrough", passthrough_str]
         print(f"📋 Full command: {' '.join(xc8_cmd)}")
 
         # Use xc8-wrapper with passthrough
