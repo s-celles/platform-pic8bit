@@ -56,12 +56,10 @@ except ImportError as e:
 
 # Configure compiler for PIC16F876A
 DEVICE = env.BoardConfig().get("build.mcu", "pic16f876a")
-OPTIMIZATION = env.GetProjectOption("optimization_level", "2")
 F_CPU = env.BoardConfig().get("build.f_cpu", "4000000L")
 
 print(f"🎯 Target device: {DEVICE}")
 print(f"⚡ CPU frequency: {F_CPU}")
-print(f"🔧 Optimization level: {OPTIMIZATION}")
 print("")
 
 
@@ -149,13 +147,15 @@ def build_with_xc8_wrapper(target, source, env):
                 print(f"🔧 DEBUG: Is C? {src_path.suffix.lower() in {'.c'}}")
 
             # Base arguments for all file types
-            xc8_args = [
-                f"-mcpu={DEVICE}",
-                f"-O{OPTIMIZATION}",
-                f"-D_XTAL_FREQ={clean_f_cpu}",
-                "-DDEBUG=1",
-                "-Wall",
-            ]
+            xc8_args = [f"-mcpu={DEVICE}", f"-D_XTAL_FREQ={clean_f_cpu}"]
+
+            # Add build_flags from platformio.ini
+            build_flags = env.get("BUILD_FLAGS", [])
+            if build_flags:
+                print(
+                    f"🔧 DEBUG: Adding build_flags from platformio.ini: {build_flags}"
+                )
+                xc8_args.extend(build_flags)
 
             print(f"🔧 DEBUG: Base xc8_args={xc8_args}")
 
@@ -163,20 +163,15 @@ def build_with_xc8_wrapper(target, source, env):
             if has_assembly and not has_c_files:
                 # Pure assembly project - use pic-as flags
                 print("🔧 Building pure assembly project")
-                xc8_args = [
-                    f"-mcpu={DEVICE}",
-                    # pic-as specific flags
-                    "-Wa,-a",  # Generate listing
-                ]
-                print(f"🔧 DEBUG: Assembly flags: {xc8_args}")
+                print(f"🔧 DEBUG: Assembly flags (preserved): {xc8_args}")
             elif has_c_files:
                 # C project (with or without assembly)
                 print("🔧 Building C project")
-                xc8_args.extend(
-                    [
-                        "-std=c99",
-                    ]
-                )
+                # xc8_args.extend(
+                #     [
+                #         "-std=c99",
+                #     ]
+                # )
                 print(f"🔧 DEBUG: C flags added: {xc8_args}")
                 if has_assembly:
                     print("🔧 Mixed C/assembly project detected")
@@ -191,10 +186,7 @@ def build_with_xc8_wrapper(target, source, env):
             # Default to basic args
             xc8_args = [
                 f"-mcpu={DEVICE}",
-                f"-O{OPTIMIZATION}",
                 f"-D_XTAL_FREQ={clean_f_cpu}",
-                "-DDEBUG=1",
-                "-Wall",
             ]
 
         # Add all source files
@@ -211,7 +203,7 @@ def build_with_xc8_wrapper(target, source, env):
             if has_assembly and not has_c_files:
                 # Pure assembly project - use pic-as assembler
                 print("🔧 Using PIC assembler for pure assembly project")
-                tool_path, version_info = get_xc8_tool_path("pic-as")
+                tool_path, version_info = get_xc8_tool_path("as")
                 print(f"📋 Using PIC assembler: {tool_path}")
             else:
                 # C project (with or without assembly) - use xc8-cc compiler

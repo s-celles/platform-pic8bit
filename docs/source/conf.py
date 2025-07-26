@@ -6,28 +6,28 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'PIC8bit Platform'
-copyright = '2025, Sébastien Celles'
-author = 'Sébastien Celles'
-release = '0.1'
+project = "PIC8bit Platform"
+copyright = "2025, Sébastien Celles"
+author = "Sébastien Celles"
+release = "0.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
-    'myst_parser',  # For supporting Markdown
-    'sphinx_copybutton',  # Copy button for code blocks
-    'sphinx_tabs.tabs',  # Tabs
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "myst_parser",  # For supporting Markdown
+    "sphinx_copybutton",  # Copy button for code blocks
+    "sphinx_tabs.tabs",  # Tabs
 ]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
 
-root_doc = 'index'
+root_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -41,12 +41,10 @@ html_theme_options = {
     "sidebar_hide_name": True,
     "light_logo": "logo-light.png",
     "dark_logo": "logo-dark.png",
-    
     # Links to source code
     "source_repository": "https://github.com/s-celles/platform-pic8bit",
     "source_branch": "main",
     "source_directory": "docs/source",  # Changed from "docs/" to "" for correct edit link
-    
     # Custom colors
     "light_css_variables": {
         "color-brand-primary": "#2196F3",
@@ -57,11 +55,9 @@ html_theme_options = {
         "color-brand-primary": "#64B5F6",
         "color-brand-content": "#42A5F5",
     },
-    
     # Navigation
     "navigation_with_keys": True,
     "top_of_page_button": "edit",
-    
     # Footer
     "footer_icons": [
         {
@@ -85,9 +81,9 @@ html_meta = {
 }
 
 # Static files
-html_static_path = ['_static']
-html_css_files = ['custom.css']
-html_js_files = ['custom.js']
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
+html_js_files = ["custom.js"]
 
 # Favicon
 html_favicon = "_static/favicon.ico"
@@ -109,8 +105,8 @@ sphinx_tabs_disable_tab_closing = True
 
 # Configuration for intersphinx
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3/', None),
-    'platformio': ('https://docs.platformio.org/en/latest/', None),
+    "python": ("https://docs.python.org/3/", None),
+    "platformio": ("https://docs.platformio.org/en/latest/", None),
 }
 
 # MyST parser configuration
