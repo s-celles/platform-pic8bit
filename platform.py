@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-WARNING: UNOFFICIAL MICROCHIP PIC SUPPORT
+⚠️  UNOFFICIAL MICROCHIP PIC SUPPORT ⚠️
 
 This platform provides UNOFFICIAL support for Microchip PIC microcontrollers
 in PlatformIO using the XC8 compiler through xc8-wrapper.
@@ -36,7 +36,7 @@ from platformio.platform.base import PlatformBase
 
 class Pic8bitPlatform(PlatformBase):
     """
-    WARNING: UNOFFICIAL PLATFORM
+    ⚠️  UNOFFICIAL PLATFORM ⚠️
 
     This platform supports Microchip PIC 8-bit microcontrollers using:
     - XC8 compiler (via xc8-wrapper)
@@ -88,20 +88,20 @@ class Pic8bitPlatform(PlatformBase):
     def on_installed(self):
         """Called after platform installation"""
 
-        print("[*] PIC 8-bit platform installed!")
+        print("🔧 PIC 8-bit platform installed!")
         print("")
-        print("WARNING: IMPORTANT DISCLAIMERS:")
+        print("⚠️  IMPORTANT DISCLAIMERS:")
         print("   - This is UNOFFICIAL Microchip PIC support")
         print("   - NOT officially supported by Microchip or PlatformIO")
         print("   - Experimental community project - use at your own risk")
         print("")
-        print("[*] Requirements:")
+        print("📋 Requirements:")
         print("   - Microchip XC8 compiler must be installed")
         print("   - xc8-wrapper Python module required")
         print("")
-        print("[*] Documentation:")
+        print("📚 Documentation:")
         print("   https://github.com/s-celles/platform-pic8bit")
         print("")
-        print("[*] For official support, use MPLAB X IDE")
+        print("🏭 For official support, use MPLAB X IDE")
 
         return PlatformBase.on_installed(self)
