@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 # Add atpack-python-parser src to path
-atpack_parser_root = Path(__file__).parent.parent.parent.parent / "atpack-python-parser"
+atpack_parser_root = Path(__file__).parent.parent.parent / "atpack-python-parser"
 sys.path.insert(0, str(atpack_parser_root / "src"))
 
 try:
@@ -20,6 +20,13 @@ try:
 except ImportError:
     print("❌ Error: atpack_parser module not found. Please ensure atpack-python-parser is available.")
     sys.exit(1)
+
+# Import real DeviceID lookup table
+try:
+    from deviceid_lookup import DEVICE_IDS
+except ImportError:
+    print("⚠️ Warning: Real DeviceID lookup not found. Using placeholder DeviceIDs.")
+    DEVICE_IDS = {}
 
 
 class BoardGenerator:
@@ -41,6 +48,17 @@ class BoardGenerator:
         # Default configuration templates
         self.pic16_protocols = ["pickit2", "pickit3", "pickit4", "mplab-ice", "custom"]
         self.pic24_protocols = ["GEN4", "pickit3", "pickit4", "mplab-ice", "custom"]
+        
+    def get_real_device_id(self, device_name: str) -> str:
+        """Get real DeviceID from lookup table or return placeholder.
+        
+        Args:
+            device_name: Device name (e.g., 'PIC16F877A')
+            
+        Returns:
+            Real DeviceID hex string or placeholder
+        """
+        return DEVICE_IDS.get(device_name.upper(), "0x00000000")
     
     def normalize_device_name(self, device_name: str) -> str:
         """Normalize device name for use in filenames and MCU fields."""
@@ -134,7 +152,15 @@ class BoardGenerator:
                 "maximum_ram_size": spec.get("maximum_ram_size", 0),
                 "maximum_size": spec.get("maximum_size", 0),
                 "protocol": self.get_upload_protocol(spec["series"]),
-                "protocols": self.get_protocols_list(spec["series"])
+                "protocols": self.get_protocols_list(spec["series"]),
+                "info": {
+                    "DeviceID": self.get_real_device_id(device_name),
+                    "FlashEnd": f"0x{spec.get('maximum_size', 0):X}",
+                    "Eeprom": spec.get('eeprom_addr', '0x0') or "0x0",
+                    "EepromSize": spec.get('eeprom_size', 0),
+                    "Config": spec.get('config_addr', '0x0') or "0x0",
+                    "ConfigSize": spec.get('config_size', 0)
+                }
             },
             "url": f"https://www.microchip.com/en-us/product/{device_name.upper()}",
             "vendor": "Microchip",
@@ -183,7 +209,7 @@ class BoardGenerator:
                 "protocol": self.get_upload_protocol(spec["series"]),
                 "device": device_name.upper(),
                 "info": {
-                    "DeviceID": "0x00000000",  # Would need additional parsing for real device ID
+                    "DeviceID": self.get_real_device_id(device_name),
                     "FlashEnd": flash_end,
                     "Eeprom": spec.get("eeprom_addr", "0x0") if spec.get("eeprom_addr") else "0x0",
                     "EepromSize": spec.get("eeprom_size", 0),

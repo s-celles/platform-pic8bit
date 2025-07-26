@@ -1,10 +1,10 @@
 {
   "build": {
-    "core": "16f84",
-    "extra_flags": "-DPIC16F84",
+    "core": "16lf722a",
+    "extra_flags": "-DPIC16LF722A",
     "f_cpu": "4000000",
-    "mcu": "16f84",
-    "variant": "16f84"
+    "mcu": "16lf722a",
+    "variant": "16lf722a"
   },
   "debug": {
     "tools": {
@@ -13,7 +13,7 @@
           "executable": "bin/mplabx-ice",
           "arguments": [
             "--chip",
-            "PIC16F84"
+            "PIC16LF722A"
           ]
         }
       }
@@ -22,10 +22,10 @@
   "frameworks": [
     "pic-xc8"
   ],
-  "name": "⚠️ UNOFFICIAL PIC16F84",
+  "name": "⚠️ UNOFFICIAL PIC16LF722A",
   "upload": {
-    "maximum_ram_size": 68,
-    "maximum_size": 1024,
+    "maximum_ram_size": 128,
+    "maximum_size": 2048,
     "protocol": "pickit3",
     "protocols": [
       "pickit2",
@@ -33,17 +33,9 @@
       "pickit4",
       "mplab-ice",
       "custom"
-    ],
-    "info": {
-      "DeviceID": "0x00000000",
-      "FlashEnd": "0x400",
-      "Eeprom": "0x2100",
-      "EepromSize": 64,
-      "Config": "0x2007",
-      "ConfigSize": 1
-    }
+    ]
   },
-  "url": "https://www.microchip.com/en-us/product/PIC16F84",
+  "url": "https://www.microchip.com/en-us/product/PIC16LF722A",
   "vendor": "Microchip",
   "disclaimers": {
     "unofficial": "⚠️ UNOFFICIAL board support - NOT officially supported by Microchip",
