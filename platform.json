@@ -38,7 +38,24 @@
     }
   },
   "boards": {
-    "pic16f876a": "boards/pic16f876a.json"
+    "pic16f876a": "boards/pic16f876a.json",
+    "pic16f877": "boards/pic16f877.json"
+  },
+  "examples": {
+    "pic16f877-blink": {
+      "name": "PIC16F877 LED Blink (C)",
+      "description": "Basic LED blinking example for PIC16F877 using C language",
+      "path": "examples/pic16f877-blink",
+      "board": "pic16f877",
+      "framework": "pic-xc8"
+    },
+    "pic16f877-asm-blink": {
+      "name": "PIC16F877 LED Blink (Assembly)",
+      "description": "Basic LED blinking example for PIC16F877 using assembly language",
+      "path": "examples/pic16f877-asm-blink",
+      "board": "pic16f877", 
+      "framework": "pic-xc8"
+    }
   },
   "disclaimers": {
     "unofficial_support": "⚠️ This is UNOFFICIAL support for Microchip PIC microcontrollers",

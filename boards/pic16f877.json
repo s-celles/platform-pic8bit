@@ -41,5 +41,26 @@
     "unofficial": "⚠️ UNOFFICIAL board support - NOT officially supported by Microchip",
     "experimental": "Experimental community project - use at your own risk",
     "official_tools": "For official support, use MPLAB X IDE from Microchip"
+  },
+  "examples": {
+    "blink_c": {
+      "name": "LED Blink (C)",
+      "description": "Basic LED blinking example using C language",
+      "path": "examples/pic16f877-blink",
+      "language": "c",
+      "difficulty": "beginner"
+    },
+    "blink_asm": {
+      "name": "LED Blink (Assembly)",
+      "description": "Basic LED blinking example using assembly language",
+      "path": "examples/pic16f877-asm-blink", 
+      "language": "assembly",
+      "difficulty": "intermediate"
+    }
+  },
+  "documentation": {
+    "getting_started": "https://github.com/s-celles/PIC_Test_Project/blob/main/platform-pic8bit/README.md",
+    "examples": "https://github.com/s-celles/PIC_Test_Project/tree/main/platform-pic8bit/examples",
+    "datasheet": "https://ww1.microchip.com/downloads/en/devicedoc/39582b.pdf"
   }
 }
