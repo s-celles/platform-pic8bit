@@ -224,7 +224,7 @@ def build_with_xc8_wrapper(target, source, env):
 
             # Add output file to passthrough
             passthrough_args.extend(["-o", str(output_hex)])
-            
+
             # Add source files to passthrough as well
             passthrough_args.extend(source_files)
 
@@ -244,7 +244,7 @@ def build_with_xc8_wrapper(target, source, env):
 
             # Add output file to passthrough
             passthrough_args.extend(["-o", str(output_hex)])
-            
+
             # Add source files to passthrough as well
             passthrough_args.extend(source_files)
 
