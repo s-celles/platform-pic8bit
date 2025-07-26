@@ -1,10 +1,10 @@
 {
   "build": {
-    "core": "16f876a",
-    "extra_flags": "-DPIC16F876A",
+    "core": "16f616",
+    "extra_flags": "-DPIC16F616",
     "f_cpu": "4000000",
-    "mcu": "16f876a",
-    "variant": "16f876a"
+    "mcu": "16f616",
+    "variant": "16f616"
   },
   "debug": {
     "tools": {
@@ -13,7 +13,7 @@
           "executable": "bin/mplabx-ice",
           "arguments": [
             "--chip",
-            "PIC16F876A"
+            "PIC16F616"
           ]
         }
       }
@@ -22,10 +22,10 @@
   "frameworks": [
     "pic-xc8"
   ],
-  "name": "⚠️ UNOFFICIAL PIC16F876A",
+  "name": "⚠️ UNOFFICIAL PIC16F616",
   "upload": {
-    "maximum_ram_size": 368,
-    "maximum_size": 8192,
+    "maximum_ram_size": 128,
+    "maximum_size": 2048,
     "protocol": "pickit3",
     "protocols": [
       "pickit2",
@@ -35,7 +35,7 @@
       "custom"
     ]
   },
-  "url": "https://www.microchip.com/en-us/product/PIC16F876A",
+  "url": "https://www.microchip.com/en-us/product/PIC16F616",
   "vendor": "Microchip",
   "disclaimers": {
     "unofficial": "⚠️ UNOFFICIAL board support - NOT officially supported by Microchip",
