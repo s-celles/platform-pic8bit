@@ -5,8 +5,21 @@
 XC8 framework for PlatformIO using xc8-wrapper and SCons-based build system.
 
 IMPORTANT DISCLAIMERS:
-- This is NOT official Microchip or PlatformIO support
-- This is an EXPERIMENTAL community project
+- This is NOT official Microchip or PlatformIO sup        else:
+            # C project - use xc8-wrapper cc with passthrough
+            print("🔧 Using xc8-wrapper cc with passthrough for C project")
+
+            # Prepare passthrough arguments for xc8-cc
+            passthrough_args = []
+            for arg in xc8_args:
+                if arg not in source_files and not arg.startswith("-o"):
+                    passthrough_args.append(arg)
+
+            passthrough_str = " ".join(passthrough_args)
+            xc8_cmd = [
+                "xc8-wrapper", "cc",
+                "--passthrough", passthrough_str
+            ] + source_files + ["-o", str(output_hex)] an EXPERIMENTAL community project
 - Uses xc8-wrapper to interface with XC8 compiler
 - Requires XC8 compiler to be installed separately
 
@@ -190,43 +203,53 @@ def build_with_xc8_wrapper(target, source, env):
             ]
 
         # Add all source files
-        xc8_args.extend(source_files)
+        # Note: Source files and output will be handled in the xc8-wrapper command construction
 
         # Output file
         output_hex = output_path / "firmware.hex"
-        xc8_args.extend(["-o", str(output_hex)])
+        # Note: Output file will be handled in the xc8-wrapper command construction
 
         print("🔨 Compiling and linking with XC8...")
 
-        # Get appropriate compiler/assembler path based on project type
-        try:
-            if has_assembly and not has_c_files:
-                # Pure assembly project - use pic-as assembler
-                print("🔧 Using PIC assembler for pure assembly project")
-                tool_path, version_info = get_xc8_tool_path("as")
-                print(f"📋 Using PIC assembler: {tool_path}")
-            else:
-                # C project (with or without assembly) - use xc8-cc compiler
-                print("🔧 Using XC8 compiler for C project")
-                tool_path, version_info = get_xc8_tool_path("cc")
-                print(f"📋 Using XC8 compiler: {tool_path}")
+        # Build the command using xc8-wrapper with passthrough
+        if has_assembly and not has_c_files:
+            # Pure assembly project - use xc8-wrapper as with passthrough
+            print("🔧 Using xc8-wrapper as with passthrough for pure assembly project")
 
-            print(f"📋 Version: {version_info}")
-        except Exception as e:
-            print(f"❌ Failed to find XC8 tool: {e}")
-            print("📋 Make sure XC8 compiler is installed from Microchip")
-            print("📋 Expected locations: C:/Program Files/Microchip/xc8/v*/bin/")
-            return 1
+            # Prepare passthrough arguments for pic-as
+            passthrough_args = []
+            for arg in xc8_args:
+                if arg not in source_files and not arg.startswith("-o"):
+                    passthrough_args.append(arg)
 
-        # Build the complete command
-        xc8_cmd = [tool_path] + xc8_args
+            # Add source files to the main command
+            passthrough_str = " ".join(passthrough_args)
+            xc8_cmd = (
+                ["xc8-wrapper", "as", "--passthrough", passthrough_str]
+                + source_files
+                + ["-o", str(output_hex)]
+            )
+
+        else:
+            # C project - use xc8-wrapper cc with passthrough
+            print("� Using xc8-wrapper cc with passthrough for C project")
+
+            # Prepare passthrough arguments for xc8-cc
+            passthrough_args = []
+            for arg in xc8_args:
+                if arg not in source_files and not arg.startswith("-o"):
+                    passthrough_args.append(arg)
+
+            passthrough_str = " ".join(passthrough_args)
+            xc8_cmd = (
+                ["xc8-wrapper", "cc", "--passthrough", passthrough_str]
+                + source_files
+                + ["-o", str(output_hex)]
+            )
         print(f"📋 Full command: {' '.join(xc8_cmd)}")
 
-        # Use xc8-wrapper to compile and link
-        if has_assembly and not has_c_files:
-            success = run_command(xc8_cmd, "Assembling PIC firmware")
-        else:
-            success = run_command(xc8_cmd, "Compiling and linking PIC firmware")
+        # Use xc8-wrapper with passthrough
+        success = run_command(xc8_cmd, "Building PIC firmware with xc8-wrapper")
 
         if not success:
             print("❌ Compilation/linking failed!")
