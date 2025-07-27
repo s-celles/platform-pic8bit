@@ -36,6 +36,9 @@ from SCons.Script import (
     DefaultEnvironment,
 )
 
+# Try to import Jinja2 for template rendering (required dependency)
+from jinja2 import Environment, FileSystemLoader
+
 # Initialize PlatformIO environment
 env = DefaultEnvironment()
 
@@ -125,6 +128,17 @@ def get_project_sources():
     return source_files
 
 
+def generate_header_fallback(template_vars):
+    """Generate PIC header content using Jinja2 template (required)"""
+    framework_dir = Path(__file__).parent
+    templates_dir = framework_dir / "templates"
+    
+    # Use Jinja2 template engine (required dependency)
+    env_jinja = Environment(loader=FileSystemLoader(str(templates_dir)))
+    template = env_jinja.get_template('pic_includes.h.j2')
+    return template.render(**template_vars)
+
+
 def transpile_cpp_files(cpp_files, header_files):
     """Transpile C++ files to C using xc8plusplus"""
     print("[C++] Starting C++ to C transpilation...")
@@ -138,8 +152,23 @@ def transpile_cpp_files(cpp_files, header_files):
             print("[WARNING] xc8plusplus not available - attempting manual transpilation")
             return attempt_manual_transpilation()
         
-        # Create transpiler instance
+        # Create transpiler instance with XC8 include paths
         transpiler = XC8Transpiler()
+        
+        # Configure transpiler with XC8 include paths
+        xc8_include_paths = [
+            r"C:\Program Files\Microchip\xc8\v3.00\pic\include",
+            r"C:\Program Files\Microchip\xc8\v3.00\pic\include\proc"
+        ]
+        
+        # Add include paths to transpiler if it supports it
+        if hasattr(transpiler, 'add_include_path'):
+            for path in xc8_include_paths:
+                transpiler.add_include_path(path)
+        elif hasattr(transpiler, 'include_paths'):
+            transpiler.include_paths.extend(xc8_include_paths)
+        
+        print(f"[C++] Configured transpiler with XC8 include paths: {xc8_include_paths}")
         
         # Create output directory for transpiled files
         cpp_dir = Path(cpp_files[0]).parent
@@ -150,109 +179,37 @@ def transpile_cpp_files(cpp_files, header_files):
         print(f"[C++] Target device: {DEVICE}")
         print(f"[C++] CPU frequency: {F_CPU}")
         
-        # Create a temporary header file with PIC includes for transpilation
+        # Create header that includes universal PIC stubs and device configuration
         temp_header = output_dir / "pic_includes.h"
-        pic_header_content = f"""
-// Temporary header for C++ transpilation with PIC definitions
-#ifndef PIC_INCLUDES_H
-#define PIC_INCLUDES_H
-
-// XC8 compiler detection
-#ifndef __XC8__
-#define __XC8__ 1
-#endif
-
-// Device-specific definitions
-#ifndef __{DEVICE.upper()}__
-#define __{DEVICE.upper()}__ 1
-#endif
-
-// Crystal frequency
-#ifndef _XTAL_FREQ
-#define _XTAL_FREQ {F_CPU.rstrip("LUlu")}
-#endif
-
-// For transpilation, we need minimal definitions to satisfy Clang
-// The actual register definitions will come from xc.h during final compilation
-#ifndef __clang__
-// Real XC8 compilation - use actual headers
-#include <xc.h>
-#else
-// Clang transpilation - provide minimal stubs
-// These are just to make Clang happy during transpilation
-// The real definitions come from xc.h during XC8 compilation
-
-// Minimal register bit field stubs for transpilation only
-typedef struct {{
-    unsigned RA0 : 1; unsigned RA1 : 1; unsigned RA2 : 1; unsigned RA3 : 1;
-    unsigned RA4 : 1; unsigned RA5 : 1; unsigned : 2;
-}} __PORTAbits_t;
-
-typedef struct {{
-    unsigned RB0 : 1; unsigned RB1 : 1; unsigned RB2 : 1; unsigned RB3 : 1;
-    unsigned RB4 : 1; unsigned RB5 : 1; unsigned RB6 : 1; unsigned RB7 : 1;
-}} __PORTBbits_t;
-
-typedef struct {{
-    unsigned RC0 : 1; unsigned RC1 : 1; unsigned RC2 : 1; unsigned RC3 : 1;
-    unsigned RC4 : 1; unsigned RC5 : 1; unsigned RC6 : 1; unsigned RC7 : 1;
-}} __PORTCbits_t;
-
-typedef struct {{
-    unsigned TRISA0 : 1; unsigned TRISA1 : 1; unsigned TRISA2 : 1; unsigned TRISA3 : 1;
-    unsigned TRISA4 : 1; unsigned TRISA5 : 1; unsigned : 2;
-}} __TRISAbits_t;
-
-typedef struct {{
-    unsigned TRISB0 : 1; unsigned TRISB1 : 1; unsigned TRISB2 : 1; unsigned TRISB3 : 1;
-    unsigned TRISB4 : 1; unsigned TRISB5 : 1; unsigned TRISB6 : 1; unsigned TRISB7 : 1;
-}} __TRISBbits_t;
-
-typedef struct {{
-    unsigned TRISC0 : 1; unsigned TRISC1 : 1; unsigned TRISC2 : 1; unsigned TRISC3 : 1;
-    unsigned TRISC4 : 1; unsigned TRISC5 : 1; unsigned TRISC6 : 1; unsigned TRISC7 : 1;
-}} __TRISCbits_t;
-
-typedef struct {{
-    unsigned PS0 : 1; unsigned PS1 : 1; unsigned PS2 : 1; unsigned PSA : 1;
-    unsigned T0SE : 1; unsigned T0CS : 1; unsigned INTEDG : 1; unsigned NOT_RBPU : 1;
-}} __OPTION_REGbits_t;
-
-typedef struct {{
-    unsigned RBIF : 1; unsigned INTF : 1; unsigned T0IF : 1; unsigned RBIE : 1;
-    unsigned INTE : 1; unsigned T0IE : 1; unsigned PEIE : 1; unsigned GIE : 1;
-}} __INTCONbits_t;
-
-// Minimal extern declarations for Clang transpilation
-extern volatile __PORTAbits_t PORTAbits;
-extern volatile __PORTBbits_t PORTBbits;
-extern volatile __PORTCbits_t PORTCbits;
-extern volatile __TRISAbits_t TRISAbits;
-extern volatile __TRISBbits_t TRISBbits;
-extern volatile __TRISCbits_t TRISCbits;
-extern volatile __OPTION_REGbits_t OPTION_REGbits;
-extern volatile __INTCONbits_t INTCONbits;
-
-extern volatile unsigned char PORTA;
-extern volatile unsigned char PORTB;
-extern volatile unsigned char PORTC;
-extern volatile unsigned char TRISA;
-extern volatile unsigned char TRISB;
-extern volatile unsigned char TRISC;
-extern volatile unsigned char TMR0;
-extern volatile unsigned char OPTION_REG;
-extern volatile unsigned char INTCON;
-
-// Stub delay macros for transpilation
-#define __delay_ms(x) do {{ /* transpilation stub */ }} while(0)
-#define __delay_us(x) do {{ /* transpilation stub */ }} while(0)
-
-#endif // __clang__
-
-#endif // PIC_INCLUDES_H
-"""
+        
+        # Get paths for template system
+        framework_dir = Path(__file__).parent
+        stubs_file = framework_dir / "pic_universal_stubs.h"
+        templates_dir = framework_dir / "templates"
+        
+        # Prepare template variables
+        template_vars = {
+            'device': DEVICE,
+            'device_upper': DEVICE.upper(),
+            'f_cpu': F_CPU,
+            'clean_f_cpu': F_CPU.rstrip("LUlu"),
+            'stubs_file_path': stubs_file.as_posix()
+        }
+        
+        # Generate header using Jinja2 template engine (required)
+        env_jinja = Environment(loader=FileSystemLoader(str(templates_dir)))
+        template = env_jinja.get_template('pic_includes.h.j2')
+        pic_header_content = template.render(**template_vars)
+        print(f"[C++] Using Jinja2 template engine from: {templates_dir}")
+        
         temp_header.write_text(pic_header_content)
-        print(f"[C++] Created temporary PIC header: {temp_header}")
+        print(f"[C++] Created device-specific header: {temp_header}")
+        print(f"[C++] Using universal stubs from: {stubs_file}")
+        
+        # Verify the stubs file exists
+        if not stubs_file.exists():
+            print(f"[ERROR] Universal stubs file not found: {stubs_file}")
+            return None
         
         # Copy all header files to the output directory first
         print("[C++] Copying header files to output directory...")
@@ -350,7 +307,7 @@ extern volatile unsigned char INTCON;
                     
                     # Check if main function already exists
                     if "void main(" not in content and "int main(" not in content:
-                        # Add the main function at the end
+                        # Add standard main function (no template needed)
                         main_function = '''
 // Include necessary headers for main function
 #include <xc.h>
@@ -363,119 +320,12 @@ void main(void) {
     // System initialization
     PIN_MANAGER_Initialize();
     
-    // Create Timer0 instance and initialize
-    Timer0 timer;
-    Timer0_init(&timer);
-    Timer0_initialize(&timer);
-    
-    // Create LED instances (using struct initialization)
-    Led led0, led1, led2, led3, led4;
-    Led_init(&led0);
-    Led_init(&led1);
-    Led_init(&led2);
-    Led_init(&led3);
-    Led_init(&led4);
-    
-    // Create Button instances
-    Button button0, button1, button2;
-    Button_init(&button0);
-    Button_init(&button1);
-    Button_init(&button2);
-    
-    // Ensure all LEDs are off initially
-    Led_turnOff(&led0);
-    Led_turnOff(&led1);
-    Led_turnOff(&led2);
-    Led_turnOff(&led3);
-    Led_turnOff(&led4);
-    
     // Main loop
     while(1) {
-        // Update button states (for debouncing)
-        Button_update(&button0);
-        Button_update(&button1);
-        Button_update(&button2);
-        
-        // LED test - blinking sequence using C-style function calls
-        Led_turnOn(&led0);
-        __delay_ms(100);
-        Led_turnOff(&led0);
-        
-        Led_turnOn(&led1);
-        __delay_ms(100);
-        Led_turnOff(&led1);
-        
-        Led_turnOn(&led2);
-        __delay_ms(100);
-        Led_turnOff(&led2);
-        
-        Led_turnOn(&led3);
-        __delay_ms(100);
-        Led_turnOff(&led3);
-        
-        Led_turnOn(&led4);
-        __delay_ms(100);
-        Led_turnOff(&led4);
-        
-        // Pause between sequences
-        __delay_ms(500);
-        
-        // Button test using C-style button function calls
-        if (Button_isPressed(&button0)) {
-            Led_turnOn(&led0);
-            Led_turnOn(&led1);
-        } else {
-            Led_turnOff(&led0);
-            Led_turnOff(&led1);
-        }
-        
-        if (Button_isPressed(&button1)) {
-            Led_turnOn(&led2);
-            Led_turnOn(&led3);
-        } else {
-            Led_turnOff(&led2);
-            Led_turnOff(&led3);
-        }
-        
-        if (Button_isPressed(&button2)) {
-            Led_turnOn(&led4);
-        } else {
-            Led_turnOff(&led4);
-        }
-        
-        // Demonstrate edge detection
-        if (Button_wasJustPressed(&button0)) {
-            // Button 0 was just pressed - blink LED4 3 times
-            Led_blink(&led4);
-        }
-        
-        if (Button_wasJustPressed(&button1)) {
-            // Button 1 was just pressed - toggle LED0
-            Led_toggle(&led0);
-        }
-        
-        // Use Timer0 for some delays
-        if (Button_wasJustPressed(&button2)) {
-            // Button 2 was just pressed - use Timer0 delay
-            Timer0_delay(&timer);
-            Led_turnOn(&led0);
-            Led_turnOn(&led1);
-            Led_turnOn(&led2);
-            Led_turnOn(&led3);
-            Led_turnOn(&led4);
-            Timer0_delay(&timer);
-            Led_turnOff(&led0);
-            Led_turnOff(&led1);
-            Led_turnOff(&led2);
-            Led_turnOff(&led3);
-            Led_turnOff(&led4);
-        }
-        
-        // Small delay to prevent excessive polling
+        // Application logic goes here
         __delay_ms(10);
     }
 }
-
 '''
                         content += main_function
                         main_c_path.write_text(content)

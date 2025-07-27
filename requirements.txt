@@ -1,6 +1,9 @@
 # Python dependencies for platform-pic8bit
 # These are automatically installed when the platform is installed
 
+# Template engine for code generation
+jinja2>=3.0.0
+
 # XC8 Wrapper - Secure interface to XC8 compiler
 git+https://github.com/s-celles/xc8-wrapper.git
 

@@ -1,0 +1,23 @@
+// Device-specific header for PIC {{ device_upper }}
+// Generated from template using device={{ device }}, f_cpu={{ f_cpu }}
+#ifndef PIC_INCLUDES_H
+#define PIC_INCLUDES_H
+
+// Device definitions for both transpilation and XC8 compilation
+#ifndef __{{ device_upper }}__
+#define __{{ device_upper }}__ 1
+#endif
+
+#ifndef _XTAL_FREQ
+#define _XTAL_FREQ {{ clean_f_cpu }}
+#endif
+
+#ifdef __clang__
+    // Include universal PIC transpilation stubs
+    #include "{{ stubs_file_path }}"
+#else
+    // Real XC8 compilation - use actual headers
+    #include <xc.h>
+#endif
+
+#endif // PIC_INCLUDES_H

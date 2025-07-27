@@ -41,6 +41,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
+    "jinja2>=3.0.0",
     "xc8-wrapper @ git+https://github.com/s-celles/xc8-wrapper.git",
     "ipecmd-wrapper @ git+https://github.com/s-celles/ipecmd-wrapper.git"
 ]
@@ -86,9 +87,13 @@ include = ["platform_pic8bit*"]
     "*.py", 
     "*.md",
     "*.txt",
+    "*.h",
+    "*.j2",
     "boards/*.json",
     "examples/**/*",
-    "builder/**/*.py"
+    "builder/**/*.py",
+    "builder/**/*.h",
+    "builder/**/templates/*.j2"
 ]
 
 # Black configuration
