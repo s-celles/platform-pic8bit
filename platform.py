@@ -85,6 +85,77 @@ class Pic8bitPlatform(PlatformBase):
             "Use MPLAB X IDE for debugging PIC microcontrollers."
         )
 
+    def transpile_cpp_to_c(self, project_dir):
+        """
+        Transpile C++ files to C using xc8plusplus
+        
+        Args:
+            project_dir: Path to the project directory
+            
+        Returns:
+            bool: True if transpilation successful, False otherwise
+        """
+        try:
+            import sys
+            from pathlib import Path
+            
+            # Try to import xc8plusplus
+            try:
+                from xc8plusplus import XC8Transpiler
+            except ImportError:
+                print("[WARNING] xc8plusplus not installed. C++ transpilation disabled.")
+                print("[INFO] Install with: pip install git+https://github.com/s-celles/xc8plusplus.git")
+                return False
+            
+            project_path = Path(project_dir)
+            cpp_files = list(project_path.glob("**/*.cpp"))
+            hpp_files = list(project_path.glob("**/*.hpp"))
+            
+            if not cpp_files and not hpp_files:
+                print("[INFO] No C++ files found. Skipping transpilation.")
+                return True
+            
+            print(f"[TRANSPILE] Found {len(cpp_files)} .cpp and {len(hpp_files)} .hpp files")
+            
+            # Create output directory
+            output_dir = project_path / "generated_c"
+            output_dir.mkdir(exist_ok=True)
+            
+            # Initialize transpiler
+            transpiler = XC8Transpiler()
+            
+            # Transpile C++ files
+            success = True
+            for cpp_file in cpp_files:
+                output_file = output_dir / f"{cpp_file.stem}.c"
+                print(f"[TRANSPILE] {cpp_file.name} -> {output_file.name}")
+                
+                if not transpiler.transpile(cpp_file, output_file):
+                    print(f"[ERROR] Failed to transpile {cpp_file}")
+                    success = False
+            
+            # Convert header files
+            for hpp_file in hpp_files:
+                output_file = output_dir / f"{hpp_file.stem}.h"
+                print(f"[TRANSPILE] {hpp_file.name} -> {output_file.name}")
+                
+                # Simple header conversion (remove C++ specific syntax)
+                content = hpp_file.read_text()
+                content = content.replace('.hpp"', '.h"')
+                content = content.replace('_HPP', '_H')
+                output_file.write_text(content)
+            
+            if success:
+                print(f"[TRANSPILE] SUCCESS: Transpilation completed. Output in {output_dir}")
+            else:
+                print("[TRANSPILE] ERROR: Some files failed to transpile")
+            
+            return success
+            
+        except Exception as e:
+            print(f"[TRANSPILE] ERROR: {e}")
+            return False
+
     def on_installed(self):
         """Called after platform installation"""
         print("[SETUP] PIC 8-bit platform installed!")
@@ -108,6 +179,7 @@ class Pic8bitPlatform(PlatformBase):
         dependencies = [
             "git+https://github.com/s-celles/xc8-wrapper.git",
             "git+https://github.com/s-celles/ipecmd-wrapper.git",
+            "git+https://github.com/s-celles/xc8plusplus.git",  # C++ transpiler
         ]
 
         print("[SETUP] Installing Python dependencies...")
@@ -145,6 +217,7 @@ class Pic8bitPlatform(PlatformBase):
         print("[INFO] Requirements:")
         print("   - Microchip XC8 compiler must be installed")
         print("   - MPLAB X IDE (for device programming)")
+        print("   - Python 3.8+ (for C++ transpilation support)")
         print("")
         print("[NEXT] To get started:")
         print("   1. Ensure XC8 compiler is installed from Microchip")
@@ -153,9 +226,17 @@ class Pic8bitPlatform(PlatformBase):
             '      pio project init --board pic16f876a --project-option "framework=pic-xc8"'
         )
         print("   3. Check examples in platform-pic8bit/examples/")
+        print("   4. For C++ projects, use the cpp-multi example")
         print("")
         print("[HELP] For examples and documentation:")
-        print("   - Examples: platform-pic8bit/examples/")
+        print("   - C Examples: platform-pic8bit/examples/")
+        print("   - C++ Example: src/cpp-multi/")
         print("   - Documentation: https://github.com/s-celles/platform-pic8bit")
+        print("")
+        print("[C++ SUPPORT] xc8plusplus transpiler features:")
+        print("   - C++ classes transpiled to C structs + functions")
+        print("   - Modern C++ syntax for embedded development")
+        print("   - Automatic integration with XC8 toolchain")
+        print("   - Type-safe hardware abstraction")
         print("")
         print("[SUPPORT] For official support, use MPLAB X IDE from Microchip")
