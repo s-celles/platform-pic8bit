@@ -1,2 +1,12 @@
-xc8_wrapper
-ipecmd_wrapper
+# Python dependencies for platform-pic8bit
+# These are automatically installed when the platform is installed
+
+# XC8 Wrapper - Secure interface to XC8 compiler
+git+https://github.com/s-celles/xc8-wrapper.git
+
+# IPECMD Wrapper - Interface to MPLAB IPE command line tool
+git+https://github.com/s-celles/ipecmd-wrapper.git
+
+# Optional: Additional tools
+# colorama>=0.4.4  # For colored terminal output
+# typer>=0.9.0     # For CLI interfaces

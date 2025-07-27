@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-⚠️  UNOFFICIAL XC8 FRAMEWORK ⚠️
+[WARNING]  UNOFFICIAL XC8 FRAMEWORK [WARNING]
 
 XC8 framework for PlatformIO using xc8-wrapper and SCons-based build system.
 
 IMPORTANT DISCLAIMERS:
 - This is NOT official Microchip or PlatformIO sup        else:
             # C project - use xc8-wrapper cc with passthrough
-            print("🔧 Using xc8-wrapper cc with passthrough for C project")
+            print("[SETUP] Using xc8-wrapper cc with passthrough for C project")
 
             # Prepare passthrough arguments for xc8-cc
             passthrough_args = []
@@ -41,10 +41,10 @@ env = DefaultEnvironment()
 
 # Print framework info
 print("")
-print("🔧 XC8 Framework initialized (UNOFFICIAL)")
-print("⚠️  NOT officially supported by Microchip or PlatformIO")
-print("📋 Using xc8-wrapper to interface with XC8 compiler")
-print("🎯 Target: PIC microcontrollers")
+print("[SETUP] XC8 Framework initialized (UNOFFICIAL)")
+print("[WARNING] NOT officially supported by Microchip or PlatformIO")
+print("[INFO] Using xc8-wrapper to interface with XC8 compiler")
+print("[TARGET] Target: PIC microcontrollers")
 print("")
 
 # Get project paths
@@ -52,27 +52,27 @@ PROJECT_DIR = env.subst("$PROJECT_DIR")
 BUILD_DIR = env.subst("$BUILD_DIR")
 PROJECT_SRC_DIR = env.subst("$PROJECT_SRC_DIR")
 
-print(f"📁 Project directory: {PROJECT_DIR}")
-print(f"📁 Build directory: {BUILD_DIR}")
-print(f"📁 Source directory: {PROJECT_SRC_DIR}")
+print(f"[DIR] Project directory: {PROJECT_DIR}")
+print(f"[DIR] Build directory: {BUILD_DIR}")
+print(f"[DIR] Source directory: {PROJECT_SRC_DIR}")
 print("")
 
 try:
     from xc8_wrapper import run_command, get_xc8_tool_path, log
 
-    print("✅ xc8-wrapper imported successfully")
+    print("[OK] xc8-wrapper imported successfully")
     xc8_available = True
 except ImportError as e:
-    print(f"❌ Failed to import xc8-wrapper: {e}")
-    print("📋 Make sure xc8-wrapper is installed or available in the project")
+    print(f"[ERROR] Failed to import xc8-wrapper: {e}")
+    print("[INFO] Make sure xc8-wrapper is installed or available in the project")
     xc8_available = False
 
 # Configure compiler for PIC16F876A
 DEVICE = env.BoardConfig().get("build.mcu", "pic16f876a")
 F_CPU = env.BoardConfig().get("build.f_cpu", "4000000L")
 
-print(f"🎯 Target device: {DEVICE}")
-print(f"⚡ CPU frequency: {F_CPU}")
+print(f"[TARGET] Target device: {DEVICE}")
+print(f"[FREQ] CPU frequency: {F_CPU}")
 print("")
 
 
@@ -88,7 +88,7 @@ def get_project_sources():
         if not str(f).endswith((".h", ".hpp"))  # Exclude header files
     ]
 
-    print(f"📁 Found {len(source_files)} source files:")
+    print(f"[DIR] Found {len(source_files)} source files:")
     for src in source_files:
         print(f"  - {src}")
 
@@ -98,17 +98,17 @@ def get_project_sources():
 # Build function using xc8-wrapper
 def build_with_xc8_wrapper(target, source, env):
     """Build using xc8-wrapper integrated with PlatformIO"""
-    print("🔄 *** PLATFORM FUNCTION *** Starting XC8 build with xc8-wrapper...")
+    print("[PROCESS] *** PLATFORM FUNCTION *** Starting XC8 build with xc8-wrapper...")
 
     if not xc8_available:
-        print("❌ xc8-wrapper not available!")
+        print("[ERROR] xc8-wrapper not available!")
         return 1
 
     try:
         # Get source files
         source_files = get_project_sources()
         if not source_files:
-            print("❌ No source files found!")
+            print("[ERROR] No source files found!")
             return 1
 
         # Set build directory
@@ -116,18 +116,18 @@ def build_with_xc8_wrapper(target, source, env):
         output_path = build_path / "output"
         output_path.mkdir(parents=True, exist_ok=True)
 
-        print(f"📁 Build directory: {build_path}")
-        print(f"📁 Output directory: {output_path}")
+        print(f"[DIR] Build directory: {build_path}")
+        print(f"[DIR] Output directory: {output_path}")
 
-        print("🔧 Starting argument construction")
+        print("[SETUP] Starting argument construction")
 
         # Prepare XC8 arguments for compilation - ensure clean F_CPU value
-        print(f"🔧 DEBUG: F_CPU={F_CPU}")
+        print(f"[SETUP] DEBUG: F_CPU={F_CPU}")
         # Force clean F_CPU value without any suffixes for XC8
         clean_f_cpu = str(F_CPU).rstrip("LUlu")
-        print(f"🔧 DEBUG: clean_f_cpu={clean_f_cpu}")
+        print(f"[SETUP] DEBUG: clean_f_cpu={clean_f_cpu}")
 
-        print("🔧 Starting argument construction")
+        print("[SETUP] Starting argument construction")
 
         # Initialize variables
         has_assembly = False
@@ -136,8 +136,8 @@ def build_with_xc8_wrapper(target, source, env):
         try:
             # Detect if we have assembly files
             assembly_extensions = {".s", ".asm", ".S", ".inc", ".as"}
-            print(f"🔧 DEBUG: source_files={source_files}")
-            print(f"🔧 DEBUG: assembly_extensions={assembly_extensions}")
+            print(f"[SETUP] DEBUG: source_files={source_files}")
+            print(f"[SETUP] DEBUG: assembly_extensions={assembly_extensions}")
 
             has_assembly = any(
                 Path(src).suffix.lower() in assembly_extensions for src in source_files
@@ -146,18 +146,18 @@ def build_with_xc8_wrapper(target, source, env):
                 Path(src).suffix.lower() in {".c"} for src in source_files
             )
 
-            print(f"🔧 DEBUG: has_assembly={has_assembly}, has_c_files={has_c_files}")
+            print(f"[SETUP] DEBUG: has_assembly={has_assembly}, has_c_files={has_c_files}")
 
             # Check each file individually
             for src in source_files:
                 src_path = Path(src)
                 print(
-                    f"🔧 DEBUG: File: {src} -> suffix: '{src_path.suffix}' -> suffix.lower(): '{src_path.suffix.lower()}'"
+                    f"[SETUP] DEBUG: File: {src} -> suffix: '{src_path.suffix}' -> suffix.lower(): '{src_path.suffix.lower()}'"
                 )
                 print(
-                    f"🔧 DEBUG: Is assembly? {src_path.suffix.lower() in assembly_extensions}"
+                    f"[SETUP] DEBUG: Is assembly? {src_path.suffix.lower() in assembly_extensions}"
                 )
-                print(f"🔧 DEBUG: Is C? {src_path.suffix.lower() in {'.c'}}")
+                print(f"[SETUP] DEBUG: Is C? {src_path.suffix.lower() in {'.c'}}")
 
             # Base arguments for all file types
             xc8_args = [f"-mcpu={DEVICE}", f"-D_XTAL_FREQ={clean_f_cpu}"]
@@ -166,33 +166,33 @@ def build_with_xc8_wrapper(target, source, env):
             build_flags = env.get("BUILD_FLAGS", [])
             if build_flags:
                 print(
-                    f"🔧 DEBUG: Adding build_flags from platformio.ini: {build_flags}"
+                    f"[SETUP] DEBUG: Adding build_flags from platformio.ini: {build_flags}"
                 )
                 xc8_args.extend(build_flags)
 
-            print(f"🔧 DEBUG: Base xc8_args={xc8_args}")
+            print(f"[SETUP] DEBUG: Base xc8_args={xc8_args}")
 
             # Add language-specific flags
             if has_assembly and not has_c_files:
                 # Pure assembly project - use pic-as flags
-                print("🔧 Building pure assembly project")
-                print(f"🔧 DEBUG: Assembly flags (preserved): {xc8_args}")
+                print("[SETUP] Building pure assembly project")
+                print(f"[SETUP] DEBUG: Assembly flags (preserved): {xc8_args}")
             elif has_c_files:
                 # C project (with or without assembly)
-                print("🔧 Building C project")
+                print("[SETUP] Building C project")
                 # xc8_args.extend(
                 #     [
                 #         "-std=c99",
                 #     ]
                 # )
-                print(f"🔧 DEBUG: C flags added: {xc8_args}")
+                print(f"[SETUP] DEBUG: C flags added: {xc8_args}")
                 if has_assembly:
-                    print("🔧 Mixed C/assembly project detected")
+                    print("[SETUP] Mixed C/assembly project detected")
             else:
-                print("⚠️ No recognized source files found")
+                print("[WARNING] No recognized source files found")
 
         except Exception as e:
-            print(f"❌ ERROR in file detection: {e}")
+            print(f"[ERROR] ERROR in file detection: {e}")
             import traceback
 
             traceback.print_exc()
@@ -209,12 +209,12 @@ def build_with_xc8_wrapper(target, source, env):
         output_hex = output_path / "firmware.hex"
         # Note: Output file will be handled in the xc8-wrapper command construction
 
-        print("🔨 Compiling and linking with XC8...")
+        print("[BUILD] Compiling and linking with XC8...")
 
         # Build the command using xc8-wrapper with passthrough
         if has_assembly and not has_c_files:
             # Pure assembly project - use xc8-wrapper as with passthrough
-            print("🔧 Using xc8-wrapper as with passthrough for pure assembly project")
+            print("[SETUP] Using xc8-wrapper as with passthrough for pure assembly project")
 
             # Prepare passthrough arguments for pic-as - include ALL arguments
             passthrough_args = []
@@ -234,7 +234,7 @@ def build_with_xc8_wrapper(target, source, env):
 
         else:
             # C project - use xc8-wrapper cc with passthrough
-            print("🔧 Using xc8-wrapper cc with passthrough for C project")
+            print("[SETUP] Using xc8-wrapper cc with passthrough for C project")
 
             # Prepare passthrough arguments for xc8-cc - include ALL arguments
             passthrough_args = []
@@ -251,17 +251,17 @@ def build_with_xc8_wrapper(target, source, env):
             # Build command with everything in passthrough - properly quote all arguments
             passthrough_str = " ".join(f'"{arg}"' for arg in passthrough_args)
             xc8_cmd = ["xc8-wrapper", "cc", "--passthrough", passthrough_str]
-        print(f"📋 Full command: {' '.join(xc8_cmd)}")
+        print(f"[INFO] Full command: {' '.join(xc8_cmd)}")
 
         # Use xc8-wrapper with passthrough
         success = run_command(xc8_cmd, "Building PIC firmware with xc8-wrapper")
 
         if not success:
-            print("❌ Compilation/linking failed!")
+            print("[ERROR] Compilation/linking failed!")
             return 1
 
-        print(f"✅ Build completed successfully!")
-        print(f"📦 Firmware ready: {output_hex}")
+        print(f"[OK] Build completed successfully!")
+        print(f"[OUTPUT] Firmware ready: {output_hex}")
 
         # Copy to PlatformIO expected location
         if target and len(target) > 0:
@@ -271,15 +271,15 @@ def build_with_xc8_wrapper(target, source, env):
                 import shutil
 
                 shutil.copy2(output_hex, target_path)
-                print(f"📋 Created target: {target_path}")
+                print(f"[INFO] Created target: {target_path}")
             else:
-                print(f"❌ Output file not found: {output_hex}")
+                print(f"[ERROR] Output file not found: {output_hex}")
                 return 1
 
         return 0
 
     except Exception as e:
-        print(f"❌ Build error: {e}")
+        print(f"[ERROR] Build error: {e}")
         import traceback
 
         traceback.print_exc()
@@ -307,5 +307,5 @@ print("  pio run          - Build firmware using xc8-wrapper")
 print("  pio run -t clean - Clean build files")
 print("  pio run -t upload- Program device (if configured)")
 print("")
-print("🏭 For official support, use MPLAB X IDE")
+print("[OFFICIAL] For official support, use MPLAB X IDE")
 print("")

@@ -1,0 +1,189 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "platform-pic8bit"
+version = "0.1.0"
+description = "Unofficial PlatformIO platform for Microchip PIC 8-bit microcontrollers"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Sebastien Celles", email = "s.celles@gmail.com"}
+]
+maintainers = [
+    {name = "Sebastien Celles", email = "s.celles@gmail.com"}
+]
+keywords = [
+    "platformio",
+    "pic", 
+    "microchip",
+    "xc8",
+    "embedded",
+    "microcontroller",
+    "8-bit"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Embedded Systems",
+    "Topic :: Software Development :: Build Tools",
+    "Environment :: Console",
+    "Framework :: PlatformIO",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "xc8-wrapper @ git+https://github.com/s-celles/xc8-wrapper.git",
+    "ipecmd-wrapper @ git+https://github.com/s-celles/ipecmd-wrapper.git"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+    "pre-commit>=3.0"
+]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+    "mkdocs-mermaid2-plugin>=1.0"
+]
+testing = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-mock>=3.10"
+]
+
+[project.urls]
+Homepage = "https://github.com/s-celles/platform-pic8bit"
+Documentation = "https://s-celles.github.io/platform-pic8bit/"
+Repository = "https://github.com/s-celles/platform-pic8bit.git"
+"Bug Reports" = "https://github.com/s-celles/platform-pic8bit/issues"
+"Feature Requests" = "https://github.com/s-celles/platform-pic8bit/discussions"
+Changelog = "https://s-celles.github.io/platform-pic8bit/changelog/"
+
+[project.scripts]
+setup-pic8bit-deps = "setup_dependencies:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["platform_pic8bit*"]
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.json",
+    "*.py", 
+    "*.md",
+    "*.txt",
+    "boards/*.json",
+    "examples/**/*",
+    "builder/**/*.py"
+]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | examples
+)/
+'''
+
+# Flake8 configuration (in setup.cfg since flake8 doesn't support pyproject.toml yet)
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg",
+    ".venv",
+    "examples"
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=platform_pic8bit",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml"
+]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests"
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["platform_pic8bit"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "setup.py",
+    "setup_dependencies.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]

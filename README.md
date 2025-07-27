@@ -48,6 +48,80 @@ The XC8 compiler & MPLAB IPE tools are **proprietary software owned exclusively 
 - This platform is **unofficial** and not supported by Microchip.
 - Make sure XC8 compiler is installed for compiling. 
 - Make sure MPLAB X and IPECMD are installed for uploading.
+- **Dependencies are automatically installed** when you install the platform
+
+## 🚀 Quick Start
+
+### Automatic Installation (Recommended)
+
+When you install this platform, it will automatically install the required Python dependencies:
+
+```bash
+# Install platform (dependencies installed automatically)
+pio platform install file://path/to/platform-pic8bit
+
+# Or install from repository
+pio platform install https://github.com/s-celles/platform-pic8bit.git
+```
+
+### Manual Installation
+
+If automatic installation fails, you can install dependencies manually:
+
+```bash
+# Option 1: Install the whole package (recommended)
+pip install -e .
+
+# Option 2: Install individual dependencies
+pip install git+https://github.com/s-celles/xc8-wrapper.git
+pip install git+https://github.com/s-celles/ipecmd-wrapper.git
+
+# Option 3: Use the setup script
+python setup_dependencies.py
+
+# Option 4: Use the console script (if package is installed)
+setup-pic8bit-deps
+```
+
+### Development Installation
+
+For development work:
+
+```bash
+# Clone and install in development mode
+git clone https://github.com/s-celles/platform-pic8bit.git
+cd platform-pic8bit
+pip install -e .[dev]
+
+# Run tests
+pytest
+
+# Format code
+black .
+
+# Type checking
+mypy .
+```
+
+### Prerequisites
+
+Before using this platform, ensure you have installed:
+
+1. **XC8 Compiler** from Microchip (required for compilation)
+2. **MPLAB X IDE** with IPECMD (required for uploading to device)
+
+### Create Your First Project
+
+```bash
+# Create new project
+pio project init --board pic16f876a --project-option "framework=pic-xc8"
+
+# Build project
+pio run
+
+# Upload to device
+pio run -t upload
+```
 - See `requirements.txt` for Python dependencies.
 
 ## 🤝 Contributing

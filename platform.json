@@ -35,6 +35,18 @@
       "optional": true,
       "version": "*",
       "description": "XC8 toolchain (must be installed separately from Microchip)"
+    },
+    "tool-xc8-wrapper": {
+      "type": "tool",
+      "optional": false,
+      "version": "https://github.com/s-celles/xc8-wrapper.git",
+      "description": "XC8 wrapper for secure compilation interface"
+    },
+    "tool-ipecmd-wrapper": {
+      "type": "tool", 
+      "optional": false,
+      "version": "https://github.com/s-celles/ipecmd-wrapper.git",
+      "description": "IPECMD wrapper for device programming interface"
     }
   },
   "boards": {
