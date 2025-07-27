@@ -146,7 +146,9 @@ def build_with_xc8_wrapper(target, source, env):
                 Path(src).suffix.lower() in {".c"} for src in source_files
             )
 
-            print(f"[SETUP] DEBUG: has_assembly={has_assembly}, has_c_files={has_c_files}")
+            print(
+                f"[SETUP] DEBUG: has_assembly={has_assembly}, has_c_files={has_c_files}"
+            )
 
             # Check each file individually
             for src in source_files:
@@ -214,7 +216,9 @@ def build_with_xc8_wrapper(target, source, env):
         # Build the command using xc8-wrapper with passthrough
         if has_assembly and not has_c_files:
             # Pure assembly project - use xc8-wrapper as with passthrough
-            print("[SETUP] Using xc8-wrapper as with passthrough for pure assembly project")
+            print(
+                "[SETUP] Using xc8-wrapper as with passthrough for pure assembly project"
+            )
 
             # Prepare passthrough arguments for pic-as - include ALL arguments
             passthrough_args = []

@@ -29,14 +29,14 @@ def read_dependencies_from_pyproject():
                 import tomli as tomllib
             except ImportError:
                 return None
-        
+
         pyproject_path = Path(__file__).parent / "pyproject.toml"
         if not pyproject_path.exists():
             return None
-            
+
         with open(pyproject_path, "rb") as f:
             data = tomllib.load(f)
-        
+
         # Extract dependencies from pyproject.toml
         dependencies = []
         for dep in data.get("project", {}).get("dependencies", []):
@@ -48,9 +48,9 @@ def read_dependencies_from_pyproject():
                     package_url = parts[1].strip()
                     module_name = package_name.replace("-", "_")
                     dependencies.append((package_url, package_name, module_name))
-        
+
         return dependencies if dependencies else None
-        
+
     except Exception as e:
         print(f"[DEBUG] Could not read pyproject.toml: {e}")
         return None
@@ -63,27 +63,35 @@ def get_dependencies():
     if deps:
         print("[INFO] Using dependencies from pyproject.toml")
         return deps
-    
+
     # Fallback to hardcoded list
     print("[INFO] Using fallback dependency list")
     return [
-        ("git+https://github.com/s-celles/xc8-wrapper.git", "xc8-wrapper", "xc8_wrapper"),
-        ("git+https://github.com/s-celles/ipecmd-wrapper.git", "ipecmd-wrapper", "ipecmd_wrapper")
+        (
+            "git+https://github.com/s-celles/xc8-wrapper.git",
+            "xc8-wrapper",
+            "xc8_wrapper",
+        ),
+        (
+            "git+https://github.com/s-celles/ipecmd-wrapper.git",
+            "ipecmd-wrapper",
+            "ipecmd_wrapper",
+        ),
     ]
 
 
 def install_dependency(package_url, package_name):
     """Install a single dependency via pip"""
     print(f"[INSTALL] Installing {package_name}...")
-    
+
     try:
         result = subprocess.run(
             [sys.executable, "-m", "pip", "install", package_url],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
-        
+
         if result.returncode == 0:
             print(f"[INSTALL] ✓ Successfully installed {package_name}")
             return True
@@ -91,7 +99,7 @@ def install_dependency(package_url, package_name):
             print(f"[INSTALL] ✗ Failed to install {package_name}")
             print(f"[INSTALL]   Error: {result.stderr.strip()}")
             return False
-            
+
     except Exception as e:
         print(f"[INSTALL] ✗ Exception installing {package_name}: {e}")
         return False
@@ -112,15 +120,15 @@ def main():
     print("PIC 8-bit Platform Dependencies Installer")
     print("=" * 60)
     print()
-    
+
     # Get dependencies from pyproject.toml or fallback
     dependencies = get_dependencies()
-    
+
     success_count = 0
-    
+
     for package_url, package_name, module_name in dependencies:
         print(f"[CHECK] Checking {package_name}...")
-        
+
         if check_dependency(module_name):
             print(f"[CHECK] ✓ {package_name} is already installed")
             success_count += 1
@@ -128,12 +136,14 @@ def main():
             print(f"[CHECK] - {package_name} not found, installing...")
             if install_dependency(package_url, package_name):
                 success_count += 1
-        
+
         print()
-    
+
     print("=" * 60)
-    print(f"Installation Summary: {success_count}/{len(dependencies)} packages installed")
-    
+    print(
+        f"Installation Summary: {success_count}/{len(dependencies)} packages installed"
+    )
+
     if success_count == len(dependencies):
         print("[SUCCESS] All dependencies installed successfully!")
         print()
@@ -155,7 +165,7 @@ def main():
         print()
         print("[ALTERNATIVE] Try installing the whole package:")
         print("              pip install -e .")
-    
+
     print("=" * 60)
 
 

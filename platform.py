@@ -94,50 +94,52 @@ class Pic8bitPlatform(PlatformBase):
         print("   - NOT officially supported by Microchip or PlatformIO")
         print("   - Experimental community project - use at your own risk")
         print("")
-        
+
         # Install Python dependencies
         self._install_python_dependencies()
-        
+
         return PlatformBase.on_installed(self)
 
     def _install_python_dependencies(self):
         """Install required Python dependencies"""
         import subprocess
         import sys
-        
+
         dependencies = [
             "git+https://github.com/s-celles/xc8-wrapper.git",
-            "git+https://github.com/s-celles/ipecmd-wrapper.git"
+            "git+https://github.com/s-celles/ipecmd-wrapper.git",
         ]
-        
+
         print("[SETUP] Installing Python dependencies...")
         print("")
-        
+
         for dep in dependencies:
-            package_name = dep.split('/')[-1].replace('.git', '')
+            package_name = dep.split("/")[-1].replace(".git", "")
             try:
                 print(f"[SETUP] Installing {package_name}...")
                 result = subprocess.run(
                     [sys.executable, "-m", "pip", "install", dep],
                     capture_output=True,
                     text=True,
-                    check=False
+                    check=False,
                 )
-                
+
                 if result.returncode == 0:
                     print(f"[SETUP] OK Successfully installed {package_name}")
                 else:
                     print(f"[SETUP] WARNING: Failed to install {package_name}")
                     if result.stderr:
                         print(f"[SETUP]   Error: {result.stderr.strip()}")
-                    print(f"[SETUP]   You may need to install manually: pip install {dep}")
-                    
+                    print(
+                        f"[SETUP]   You may need to install manually: pip install {dep}"
+                    )
+
             except Exception as e:
                 print(f"[SETUP] WARNING: Exception installing {package_name}: {e}")
                 print(f"[SETUP]   You may need to install manually: pip install {dep}")
-            
+
             print("")
-        
+
         print("[SETUP] Python dependencies installation completed!")
         print("")
         print("[INFO] Requirements:")
@@ -147,7 +149,9 @@ class Pic8bitPlatform(PlatformBase):
         print("[NEXT] To get started:")
         print("   1. Ensure XC8 compiler is installed from Microchip")
         print("   2. Create a new PlatformIO project:")
-        print("      pio project init --board pic16f876a --project-option \"framework=pic-xc8\"")
+        print(
+            '      pio project init --board pic16f876a --project-option "framework=pic-xc8"'
+        )
         print("   3. Check examples in platform-pic8bit/examples/")
         print("")
         print("[HELP] For examples and documentation:")
