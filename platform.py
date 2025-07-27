@@ -125,15 +125,15 @@ class Pic8bitPlatform(PlatformBase):
                 )
                 
                 if result.returncode == 0:
-                    print(f"[SETUP] ✓ Successfully installed {package_name}")
+                    print(f"[SETUP] OK Successfully installed {package_name}")
                 else:
-                    print(f"[SETUP] ⚠ Warning: Failed to install {package_name}")
+                    print(f"[SETUP] WARNING: Failed to install {package_name}")
                     if result.stderr:
                         print(f"[SETUP]   Error: {result.stderr.strip()}")
                     print(f"[SETUP]   You may need to install manually: pip install {dep}")
                     
             except Exception as e:
-                print(f"[SETUP] ⚠ Warning: Exception installing {package_name}: {e}")
+                print(f"[SETUP] WARNING: Exception installing {package_name}: {e}")
                 print(f"[SETUP]   You may need to install manually: pip install {dep}")
             
             print("")
