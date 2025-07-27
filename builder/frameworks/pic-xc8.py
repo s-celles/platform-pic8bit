@@ -81,6 +81,7 @@ print("")
 
 def get_project_sources():
     """Get source files from PROJECT_SRC_DIR, respecting build_src_filter and excluding headers"""
+    print("[SOURCES] *** COLLECTING SOURCE FILES ***")
     print("Collecting source files with build_src_filter support")
 
     # Use PlatformIO's standard source collection mechanism
@@ -90,19 +91,29 @@ def get_project_sources():
         for f in env.MatchSourceFiles(PROJECT_SRC_DIR, env.get("SRC_FILTER"))
     ]
     
+    print(f"[SOURCES] Raw files found: {len(all_files)}")
+    for f in all_files:
+        print(f"[SOURCES]   - {f}")
+    
     # Separate C++ and C source files
     cpp_files = [f for f in all_files if f.endswith(('.cpp', '.cxx', '.cc'))]
     c_files = [f for f in all_files if f.endswith('.c')]
     header_files = [f for f in all_files if f.endswith(('.h', '.hpp', '.hxx'))]
     
-    print(f"[DIR] Found {len(all_files)} total files:")
-    print(f"  - C++ source files: {len(cpp_files)}")
-    print(f"  - C source files: {len(c_files)}")
-    print(f"  - Header files: {len(header_files)}")
+    print(f"[SOURCES] Found {len(all_files)} total files:")
+    print(f"[SOURCES]   - C++ source files: {len(cpp_files)}")
+    for f in cpp_files:
+        print(f"[SOURCES]     * {f}")
+    print(f"[SOURCES]   - C source files: {len(c_files)}")
+    for f in c_files:
+        print(f"[SOURCES]     * {f}")
+    print(f"[SOURCES]   - Header files: {len(header_files)}")
+    for f in header_files:
+        print(f"[SOURCES]     * {f}")
     
     # If we have C++ files, transpile them
     if cpp_files:
-        print("[C++] C++ files detected - transpilation required")
+        print("[C++] *** C++ FILES DETECTED - TRANSPILATION REQUIRED ***")
         transpiled_files = transpile_cpp_files(cpp_files, header_files)
         if transpiled_files:
             # Filter out any existing transpiled C files to avoid duplicates
@@ -115,22 +126,24 @@ def get_project_sources():
             print("[ERROR] C++ transpilation failed!")
             return []
     else:
+        print("[SOURCES] No C++ files found - using C files only")
         # Only C files
         source_files = c_files
     
     # Remove duplicates and exclude header files from compilation
     source_files = list(set([f for f in source_files if not f.endswith(('.h', '.hpp', '.hxx'))]))
 
-    print(f"[DIR] Final source files for compilation ({len(source_files)}):")
+    print(f"[SOURCES] *** FINAL SOURCE FILES FOR COMPILATION ({len(source_files)}) ***")
     for src in source_files:
-        print(f"  - {src}")
+        print(f"[SOURCES]   ✓ {src}")
 
     return source_files
 
 
 def generate_header_fallback(template_vars):
     """Generate PIC header content using Jinja2 template (required)"""
-    framework_dir = Path(__file__).parent
+    # Get framework directory from environment or use relative path
+    framework_dir = Path(__file__).parent if '__file__' in globals() else Path.cwd() / "platform-pic8bit" / "builder" / "frameworks"
     templates_dir = framework_dir / "templates"
     
     # Use Jinja2 template engine (required dependency)
@@ -183,7 +196,14 @@ def transpile_cpp_files(cpp_files, header_files):
         temp_header = output_dir / "pic_includes.h"
         
         # Get paths for template system
-        framework_dir = Path(__file__).parent
+        # Handle SCons context where __file__ may not be available
+        if '__file__' in globals():
+            framework_dir = Path(__file__).parent
+        else:
+            # Fallback for SCons context - use platform directory
+            platform_dir = Path(env.PioPlatform().get_dir())
+            framework_dir = platform_dir / "builder" / "frameworks"
+        
         stubs_file = framework_dir / "pic_universal_stubs.h"
         templates_dir = framework_dir / "templates"
         
@@ -399,7 +419,10 @@ def attempt_manual_transpilation():
 # Build function using xc8-wrapper
 def build_with_xc8_wrapper(target, source, env):
     """Build using xc8-wrapper integrated with PlatformIO"""
-    print("[PROCESS] *** PLATFORM FUNCTION *** Starting XC8 build with xc8-wrapper...")
+    print("=" * 80)
+    print("[BUILD] *** XC8 BUILD FUNCTION CALLED ***")
+    print("[BUILD] *** PLATFORM FUNCTION *** Starting XC8 build with xc8-wrapper...")
+    print("=" * 80)
 
     if not xc8_available:
         print("[ERROR] xc8-wrapper not available!")
@@ -407,10 +430,13 @@ def build_with_xc8_wrapper(target, source, env):
 
     try:
         # Get source files
+        print("[BUILD] Getting project sources...")
         source_files = get_project_sources()
         if not source_files:
             print("[ERROR] No source files found!")
             return 1
+
+        print(f"[BUILD] Source files to compile: {source_files}")
 
         # Set build directory
         build_path = Path(BUILD_DIR)
