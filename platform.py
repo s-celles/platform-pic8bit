@@ -95,13 +95,8 @@ class Pic8bitPlatform(PlatformBase):
         print("   - Experimental community project - use at your own risk")
         print("")
         
-        # Use advanced installer
-        try:
-            from .platform_installer import run_platform_setup
-            run_platform_setup()
-        except ImportError:
-            # Fallback to simple installation
-            self._install_python_dependencies()
+        # Install Python dependencies
+        self._install_python_dependencies()
         
         return PlatformBase.on_installed(self)
 
@@ -116,10 +111,12 @@ class Pic8bitPlatform(PlatformBase):
         ]
         
         print("[SETUP] Installing Python dependencies...")
+        print("")
         
         for dep in dependencies:
+            package_name = dep.split('/')[-1].replace('.git', '')
             try:
-                print(f"[SETUP] Installing {dep.split('/')[-1].replace('.git', '')}...")
+                print(f"[SETUP] Installing {package_name}...")
                 result = subprocess.run(
                     [sys.executable, "-m", "pip", "install", dep],
                     capture_output=True,
@@ -128,21 +125,33 @@ class Pic8bitPlatform(PlatformBase):
                 )
                 
                 if result.returncode == 0:
-                    print(f"[SETUP] ✓ Successfully installed {dep.split('/')[-1].replace('.git', '')}")
+                    print(f"[SETUP] ✓ Successfully installed {package_name}")
                 else:
-                    print(f"[SETUP] ⚠ Warning: Failed to install {dep.split('/')[-1].replace('.git', '')}")
-                    print(f"[SETUP]   Error: {result.stderr.strip()}")
+                    print(f"[SETUP] ⚠ Warning: Failed to install {package_name}")
+                    if result.stderr:
+                        print(f"[SETUP]   Error: {result.stderr.strip()}")
                     print(f"[SETUP]   You may need to install manually: pip install {dep}")
                     
             except Exception as e:
-                print(f"[SETUP] ⚠ Warning: Exception installing {dep.split('/')[-1].replace('.git', '')}: {e}")
+                print(f"[SETUP] ⚠ Warning: Exception installing {package_name}: {e}")
                 print(f"[SETUP]   You may need to install manually: pip install {dep}")
+            
+            print("")
         
         print("[SETUP] Python dependencies installation completed!")
         print("")
-        print("[DOCS] Documentation:")
-        print("   https://github.com/s-celles/platform-pic8bit")
+        print("[INFO] Requirements:")
+        print("   - Microchip XC8 compiler must be installed")
+        print("   - MPLAB X IDE (for device programming)")
         print("")
-        print("[OFFICIAL] For official support, use MPLAB X IDE")
-
-        return PlatformBase.on_installed(self)
+        print("[NEXT] To get started:")
+        print("   1. Ensure XC8 compiler is installed from Microchip")
+        print("   2. Create a new PlatformIO project:")
+        print("      pio project init --board pic16f876a --project-option \"framework=pic-xc8\"")
+        print("   3. Check examples in platform-pic8bit/examples/")
+        print("")
+        print("[HELP] For examples and documentation:")
+        print("   - Examples: platform-pic8bit/examples/")
+        print("   - Documentation: https://github.com/s-celles/platform-pic8bit")
+        print("")
+        print("[SUPPORT] For official support, use MPLAB X IDE from Microchip")
