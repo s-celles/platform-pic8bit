@@ -295,19 +295,97 @@ def transpile_cpp_files(cpp_files, header_files):
                         c_content = c_content.replace(
                             '#include "pic_includes.h"', "#include <xc.h>"
                         )
+
+                        # Check if main function exists in the transpiled file
+                        if cpp_path.stem.lower() == "main":
+                            if (
+                                "void main(" not in c_content
+                                and "int main(" not in c_content
+                            ):
+                                # Check if this is Arduino-style code (has setup() and loop())
+                                if (
+                                    "void setup(" in c_content
+                                    and "void loop(" in c_content
+                                ):
+                                    print(
+                                        f"[ARDUINO] Arduino-style code detected in {output_file.name}"
+                                    )
+                                    print(
+                                        f"[ARDUINO] Adding Arduino framework main() function"
+                                    )
+
+                                    # Add Arduino-style main function
+                                    arduino_main = """
+
+/**
+ * @brief Main function - Arduino framework entry point
+ * @details Calls setup() once, then loop() repeatedly
+ * @note This function is automatically provided by the Arduino framework
+ */
+void main(void) {
+    setup();
+    while(1) {
+        loop();
+    }
+}
+"""
+                                    c_content += arduino_main
+                                    output_file.write_text(c_content)
+                                    print(
+                                        f"[ARDUINO] ✓ Arduino framework main() added to {output_file.name}"
+                                    )
+                                else:
+                                    print(
+                                        f"[ERROR] Main function not found in transpiled {output_file.name}"
+                                    )
+                                    print(
+                                        f"[ERROR] The xc8plusplus transpiler successfully generated class definitions"
+                                    )
+                                    print(
+                                        f"[ERROR] but failed to transpile the main() function implementation"
+                                    )
+                                    print(f"[ERROR] ")
+                                    print(f"[ERROR] Possible causes:")
+                                    print(
+                                        f"[ERROR] 1. C++ code in main() is too complex for the transpiler"
+                                    )
+                                    print(
+                                        f"[ERROR] 2. Object instantiation and method calls not supported"
+                                    )
+                                    print(f"[ERROR] 3. Transpiler configuration issue")
+                                    print(f"[ERROR] ")
+                                    print(f"[ERROR] Solutions:")
+                                    print(
+                                        f"[ERROR] 1. Use Arduino-style setup() and loop() functions"
+                                    )
+                                    print(
+                                        f"[ERROR] 2. Manually add a C main() function to {output_file.name}"
+                                    )
+                                    print(
+                                        f"[ERROR] 3. Simplify the C++ main() function"
+                                    )
+                                    print(
+                                        f"[ERROR] 4. Use a different transpiler or write C code directly"
+                                    )
+                                    return None
+                            else:
+                                print(
+                                    f"[C++] ✓ Main function found in transpiled {output_file.name}"
+                                )
+
                         output_file.write_text(c_content)
 
-                    # Only include main.c in the final compilation to avoid duplicates
-                    # The xc8plusplus transpiler generates all dependencies in each file
+                    # Only include main.c in the final compilation
+                    # The xc8plusplus transpiler should generate a complete main.c with all dependencies
                     if cpp_path.stem.lower() == "main":
                         transpiled_files.append(str(output_file))
                         main_file_found = True
                         print(
-                            f"[C++] ✓ Success: {output_file.name} (included in build)"
+                            f"[C++] ✓ Success: {output_file.name} (main file - included in build)"
                         )
                     else:
                         print(
-                            f"[C++] ✓ Success: {output_file.name} (generated but excluded from build to avoid duplicates)"
+                            f"[C++] ✓ Success: {output_file.name} (generated for dependency resolution - not directly compiled)"
                         )
                 else:
                     print(f"[C++] ✗ Failed: {cpp_path.name}")
@@ -321,50 +399,27 @@ def transpile_cpp_files(cpp_files, header_files):
                     temp_cpp.unlink()
 
         if not main_file_found:
+            print("[WARNING] No main.c file found - using fallback approach")
             print(
-                "[C++] Warning: No main.c file found. Using all transpiled files (may cause duplicates)"
+                "[WARNING] This may cause function redefinition errors but will attempt compilation"
             )
-            # Fallback to using all files if no main.c
-            all_transpiled = [str(output_dir / f"{Path(f).stem}.c") for f in cpp_files]
-            transpiled_files = [f for f in all_transpiled if Path(f).exists()]
+            # Fallback: use all transpiled files if main.c wasn't generated
+            if not transpiled_files:
+                print("[ERROR] No files were successfully transpiled!")
+                return None
+            else:
+                # Include all transpiled files as fallback
+                all_transpiled = [
+                    str(output_dir / f"{Path(f).stem}.c") for f in cpp_files
+                ]
+                transpiled_files = [f for f in all_transpiled if Path(f).exists()]
+                print(
+                    f"[WARNING] Using all {len(transpiled_files)} transpiled files as fallback"
+                )
         else:
-            # Post-process main.c to add the missing main function
-            main_c_path = output_dir / "main.c"
-            if main_c_path.exists():
-                print("[C++] Post-processing main.c to add missing main function...")
-                try:
-                    # Read the current content
-                    content = main_c_path.read_text()
-
-                    # Check if main function already exists
-                    if "void main(" not in content and "int main(" not in content:
-                        # Add standard main function (no template needed)
-                        main_function = """
-// Include necessary headers for main function
-#include <xc.h>
-
-// Forward declarations for PIN_MANAGER functions
-void PIN_MANAGER_Initialize(void);
-
-// Main function converted from C++
-void main(void) {
-    // System initialization
-    PIN_MANAGER_Initialize();
-    
-    // Main loop
-    while(1) {
-        // Application logic goes here
-        __delay_ms(10);
-    }
-}
-"""
-                        content += main_function
-                        main_c_path.write_text(content)
-                        print("[C++] ✓ Main function added to main.c")
-                    else:
-                        print("[C++] ✓ Main function already exists in main.c")
-                except Exception as e:
-                    print(f"[C++] Warning: Failed to add main function: {e}")
+            print(
+                "[C++] ✓ Main function transpiled from C++ source - using only main.c to avoid duplicates"
+            )
 
         # Clean up temporary PIC header
         if temp_header.exists():
